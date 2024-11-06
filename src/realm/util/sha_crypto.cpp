@@ -37,6 +37,17 @@
 #define REALM_USE_BUNDLED_SHA2 1
 #endif
 
+#if REALM_HAVE_WOLFSSL
+    #ifdef HAVE_CONFIG_H
+        #include <config.h>
+    #endif
+    #ifndef WOLFSSL_USER_SETTINGS
+        #include <wolfssl/options.h>
+    #else
+        #include <wolfssl/wolfcrypt/settings.h>
+    #endif
+#endif /* REALM_HAVE_WOLFSSL */
+
 #ifdef REALM_USE_BUNDLED_SHA2
 #include <sha224.hpp>
 #include <sha256.hpp>

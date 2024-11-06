@@ -54,6 +54,17 @@ public:
 #include <bcrypt.h>
 #pragma comment(lib, "bcrypt.lib")
 #else
+#if REALM_HAVE_WOLFSSL
+    #ifdef HAVE_CONFIG_H
+        #include <config.h>
+    #endif
+    #ifndef WOLFSSL_USER_SETTINGS
+        #include <wolfssl/options.h>
+    #else
+        #include <wolfssl/wolfcrypt/settings.h>
+    #endif
+#endif /* REALM_HAVE_WOLFSSL */
+
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 #endif
