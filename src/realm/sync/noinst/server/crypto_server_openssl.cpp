@@ -1,6 +1,21 @@
 #include <realm/sync/noinst/server/crypto_server.hpp>
 
-#if REALM_HAVE_WOLFSSL
+#if REALM_HAVE_OPENSSL && REALM_HAVE_WOLFSSL
+    #error "Both OpenSSL and wolfSSL enabled. Pick one."
+#endif
+
+#if REALM_HAVE_OPENSSL
+    #include <openssl/bio.h>
+    #include <openssl/pem.h>
+    #include <openssl/evp.h>
+
+    #if OPENSSL_VERSION_MAJOR >= 3
+        #include <openssl/decoder.h>
+    #else
+        #include <openssl/rsa.h>
+    #endif
+
+#elif REALM_HAVE_WOLFSSL
     #ifdef HAVE_CONFIG_H
         #include <config.h>
     #endif
@@ -9,17 +24,10 @@
     #else
         #include <wolfssl/wolfcrypt/settings.h>
     #endif
-#endif /* REALM_HAVE_WOLFSSL */
-
-#include <wolfssl/openssl/bio.h>
-#include <wolfssl/openssl/pem.h>
-#include <wolfssl/openssl/evp.h>
-
-#if OPENSSL_VERSION_MAJOR >= 3
-#include <wolfssl/openssl/decoder.h>
 #else
-#include <wolfssl/openssl/rsa.h>
-#endif
+    #error "Neiher REALM_HAVE_WOLFSSL nor REALM_HAVE_OPENSSL defined. Pick one."
+
+#endif /* REALM_HAVE_WOLFSSL */
 
 using namespace realm;
 using namespace realm::sync;
