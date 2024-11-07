@@ -24,6 +24,9 @@
     #else
         #include <wolfssl/wolfcrypt/settings.h>
     #endif
+    #include <wolfssl/openssl/bio.h>
+    #include <wolfssl/openssl/pem.h>
+    #include <wolfssl/openssl/evp.h>
 #else
     #error "Neiher REALM_HAVE_WOLFSSL nor REALM_HAVE_OPENSSL defined. Pick one."
 

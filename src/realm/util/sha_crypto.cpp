@@ -33,6 +33,7 @@
     #include <openssl/evp.h>
     #include <openssl/hmac.h>
 #elif REALM_HAVE_WOLFSSL
+    #pragma message "REALM_HAVE_WOLFSSL in sha_crypto"
     #ifdef HAVE_CONFIG_H
         #include <config.h>
     #endif
@@ -40,6 +41,11 @@
         #include <wolfssl/options.h>
     #else
         #include <wolfssl/wolfcrypt/settings.h>
+    #endif
+    #ifndef WOLFSSL_EVP_INCLUDED
+        #error "WOLFSSL_EVP_INCLUDED needed"
+    #else
+        #pragma message "sha_crypto WOLFSSL_EVP_INCLUDED"
     #endif
     #include <wolfssl/openssl/sha.h>
     #include <wolfssl/openssl/evp.h>
@@ -48,25 +54,6 @@
     #include <sha1.h>
     #define REALM_USE_BUNDLED_SHA2 1
 #endif
-
-#if REALM_HAVE_WOLFSSL
-    #ifdef HAVE_CONFIG_H
-        #include <config.h>
-    #endif
-    #ifndef WOLFSSL_USER_SETTINGS
-        #include <wolfssl/options.h>
-    #else
-        #include <wolfssl/wolfcrypt/settings.h>
-    #endif
-    #include <wolfssl/openssl/sha.h>
-    #ifndef WOLFSSL_EVP_INCLUDED
-        #error "WOLFSSL_EVP_INCLUDED needed"
-    #endif
-    #include <wolfssl/openssl/evp.h>
-    #include <wolfssl/openssl/hmac.h>
-    #include <wolfssl/openssl/sha.h>
-    #include <wolfssl/openssl/hmac.h>
-#endif /* REALM_HAVE_WOLFSSL */
 
 #ifdef REALM_USE_BUNDLED_SHA2
 #include <sha224.hpp>

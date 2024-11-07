@@ -319,7 +319,6 @@ if(REALM_NEEDS_OPENSSL OR REALM_FORCE_OPENSSL)
     endif()
     find_package(OpenSSL REQUIRED)
     set(REALM_HAVE_OPENSSL ON)
-    message(STATUS "\nALERT: REALM_HAVE_OPENSSL set ON")
     string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" OPENSSL_VERSION_MAJOR_MINOR "${OPENSSL_VERSION}")
 elseif(APPLE)
     set(REALM_HAVE_SECURE_TRANSPORT "1")
@@ -369,6 +368,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/src) # For generated files (like
 if (REALM_HAVE_WOLFSSL)
     message(STATUS "Found REALM_HAVE_WOLFSSL")
     include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr")
+    include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr/wolfcrypt")
 endif()
 
 # TODO fix hard coded paths

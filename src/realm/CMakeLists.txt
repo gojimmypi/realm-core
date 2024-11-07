@@ -346,7 +346,7 @@ endif()
 # On systems without a built-in SHA-2 implementation (or one provided by a dependency)
 # we need to bundle the public domain implementation.
 # Note: This is also used on Windows because Windows lacks a native SHA224 hash needed for realm encryption
-if(NOT APPLE AND NOT REALM_HAVE_OPENSSL AND NOT REALM_HAVE_WOLFSSL OR WIN32)
+if((NOT APPLE AND NOT REALM_HAVE_OPENSSL AND NOT REALM_HAVE_WOLFSSL) OR WIN32)
     add_library(sha2 OBJECT ../external/sha-2/sha224.cpp ../external/sha-2/sha256.cpp)
     target_include_directories(Storage PRIVATE ../external/sha-2)
     target_sources(Storage PRIVATE $<TARGET_OBJECTS:sha2>)
@@ -377,7 +377,7 @@ endif()
 
 if(REALM_ENABLE_ENCRYPTION AND UNIX AND NOT APPLE AND REALM_HAVE_OPENSSL)
     if (REALM_HAVE_WOLFSSL)
-        target_link_libraries(Storage PUBLIC WolfSSL)
+        target_link_libraries(Storage PUBLIC "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
     elseif (REALM_HAVE_OPENSSL)
         target_link_libraries(Storage PUBLIC OpenSSL::Crypto)
     endif()
