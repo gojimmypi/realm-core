@@ -21,21 +21,33 @@
 #include <realm/util/assert.hpp>
 
 #if REALM_PLATFORM_APPLE
-#include <CommonCrypto/CommonCrypto.h>
+    #include <CommonCrypto/CommonCrypto.h>
 #elif defined(_WIN32)
-#include <windows.h>
-#include <stdio.h>
-#include <bcrypt.h>
-#pragma comment(lib, "bcrypt.lib")
-#define REALM_USE_BUNDLED_SHA2 1
+    #include <windows.h>
+    #include <stdio.h>
+    #include <bcrypt.h>
+    #pragma comment(lib, "bcrypt.lib")
+    #define REALM_USE_BUNDLED_SHA2 1
 #elif REALM_HAVE_OPENSSL
-oops
-//#include <openssl/sha.h>
-//#include <openssl/evp.h>
-//#include <openssl/hmac.h>
+    #include <openssl/sha.h>
+    #include <openssl/evp.h>
+    #include <openssl/hmac.h>
+#elif REALM_HAVE_WOLFSSL
+    #ifdef HAVE_CONFIG_H
+        #include <config.h>
+    #endif
+    #ifndef WOLFSSL_USER_SETTINGS
+        #include <wolfssl/options.h>
+    #else
+        #include <wolfssl/wolfcrypt/settings.h>
+    #endif
+
+    #include <wolfssl/openssl/sha.h>
+    #include <wolfssl/openssl/evp.h>
+    #include <wolfssl/openssl/hmac.h>
 #else
-#include <sha1.h>
-#define REALM_USE_BUNDLED_SHA2 1
+    #include <sha1.h>
+    #define REALM_USE_BUNDLED_SHA2 1
 #endif
 
 #if REALM_HAVE_WOLFSSL
@@ -204,6 +216,11 @@ void sha1(const char* in_buffer, size_t in_buffer_size, unsigned char* out_buffe
     unsigned int output_size;
     message_digest(digest_type, in_buffer, in_buffer_size, out_buffer, &output_size);
     REALM_ASSERT(output_size == 20);
+#elif REALM_HAVE_WOLFSSL
+    const EVP_MD* digest_type = EVP_sha1();
+    unsigned int output_size;
+ // TODO   message_digest(digest_type, in_buffer, in_buffer_size, out_buffer, &output_size);
+    REALM_ASSERT(output_size == 20);
 #else
     SHA1(reinterpret_cast<char*>(out_buffer), in_buffer, in_buffer_size);
 #endif
@@ -221,6 +238,11 @@ void sha256(const char* in_buffer, size_t in_buffer_size, unsigned char* out_buf
     const EVP_MD* digest_type = EVP_sha256();
     unsigned int output_size;
     message_digest(digest_type, in_buffer, in_buffer_size, out_buffer, &output_size);
+    REALM_ASSERT(output_size == 32);
+#elif REALM_HAVE_WOLFSSL
+    const EVP_MD* digest_type = EVP_sha256();
+    unsigned int output_size;
+// TODO message_digest(digest_type, in_buffer, in_buffer_size, out_buffer, &output_size);
     REALM_ASSERT(output_size == 32);
 #else
     sha256_state s;
@@ -244,8 +266,14 @@ void hmac_sha224(Span<const uint8_t> in_buffer, Span<uint8_t, 28> out_buffer, Sp
     HMAC(EVP_sha224(), key.data(), static_cast<int>(key.size()), in_buffer.data(), in_buffer.size(),
          out_buffer.data(), &hashLen);
     REALM_ASSERT_DEBUG(hashLen == out_buffer.size());
+#elif REALM_HAVE_WOLFSSL
+    static_assert(SHA224_DIGEST_LENGTH == out_buffer.size());
+    unsigned int hashLen;
+    HMAC(EVP_sha224(), key.data(), static_cast<int>(key.size()), in_buffer.data(), in_buffer.size(),
+         out_buffer.data(), &hashLen);
+    REALM_ASSERT_DEBUG(hashLen == out_buffer.size());
 #else
-#error "No SHA224 digest implementation on this platform."
+    #error "No SHA224 digest implementation on this platform."
 #endif
 }
 
@@ -263,8 +291,14 @@ void hmac_sha256(Span<const uint8_t> in_buffer, Span<uint8_t, 32> out_buffer, Sp
     HMAC(EVP_sha256(), key.data(), static_cast<int>(key.size()), in_buffer.data(), in_buffer.size(),
          out_buffer.data(), &hashLen);
     REALM_ASSERT_DEBUG(hashLen == out_buffer.size());
+#elif REALM_HAVE_WOLFSSL
+    static_assert(SHA256_DIGEST_LENGTH == out_buffer.size());
+    unsigned int hashLen;
+    HMAC(EVP_sha256(), key.data(), static_cast<int>(key.size()), in_buffer.data(), in_buffer.size(),
+         out_buffer.data(), &hashLen);
+    REALM_ASSERT_DEBUG(hashLen == out_buffer.size());
 #else
-#error "No SHA56 digest implementation on this platform."
+    #error "No SHA56 digest implementation on this platform."
 #endif
 }
 
