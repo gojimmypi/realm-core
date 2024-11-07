@@ -41,7 +41,6 @@
     #else
         #include <wolfssl/wolfcrypt/settings.h>
     #endif
-
     #include <wolfssl/openssl/sha.h>
     #include <wolfssl/openssl/evp.h>
     #include <wolfssl/openssl/hmac.h>
@@ -143,7 +142,7 @@ struct Hash {
     UCHAR hash_object_buffer[512];
     DWORD hash_size;
 };
-#elif REALM_HAVE_OPENSSL
+#elif REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
 void message_digest(const EVP_MD* digest_type, const char* in_buffer, size_t in_buffer_size,
                     unsigned char* out_buffer, unsigned int* output_size)
 {
@@ -219,7 +218,7 @@ void sha1(const char* in_buffer, size_t in_buffer_size, unsigned char* out_buffe
 #elif REALM_HAVE_WOLFSSL
     const EVP_MD* digest_type = EVP_sha1();
     unsigned int output_size;
- // TODO   message_digest(digest_type, in_buffer, in_buffer_size, out_buffer, &output_size);
+    message_digest(digest_type, in_buffer, in_buffer_size, out_buffer, &output_size);
     REALM_ASSERT(output_size == 20);
 #else
     SHA1(reinterpret_cast<char*>(out_buffer), in_buffer, in_buffer_size);
@@ -242,7 +241,7 @@ void sha256(const char* in_buffer, size_t in_buffer_size, unsigned char* out_buf
 #elif REALM_HAVE_WOLFSSL
     const EVP_MD* digest_type = EVP_sha256();
     unsigned int output_size;
-// TODO message_digest(digest_type, in_buffer, in_buffer_size, out_buffer, &output_size);
+    message_digest(digest_type, in_buffer, in_buffer_size, out_buffer, &output_size);
     REALM_ASSERT(output_size == 32);
 #else
     sha256_state s;
