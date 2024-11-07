@@ -12,10 +12,12 @@
 #else
 #include <pthread.h>
 #endif
-#include <openssl/conf.h>
-#include <openssl/x509v3.h>
+#include <wolfssl/openssl/conf.h>
+#include <wolfssl/openssl/x509v3.h>
 #if REALM_HAVE_WOLFSSL
-    #include <openssl/ssl.h>
+    #pragma message "network_ssl.cpp found REALM_HAVE_WOLFSSL"
+    //#include <openssl/ssl.h>
+    #include <wolfssl/openssl/ssl.h>
 #endif
 #elif REALM_HAVE_SECURE_TRANSPORT
 #include <fstream>
@@ -127,7 +129,10 @@ OpensslInit::~OpensslInit()
     CRYPTO_cleanup_all_ex_data();
     CONF_modules_unload(1);
 #if REALM_HAVE_WOLFSSL
+    printf("Calling wolfSSL_Cleanup")
     wolfSSL_Cleanup();
+#else
+    printf("REALM_HAVE_WOLFSSL not defined")
 #endif
 }
 

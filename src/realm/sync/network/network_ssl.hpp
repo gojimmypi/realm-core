@@ -24,11 +24,14 @@
     #else
         #include <wolfssl/wolfcrypt/settings.h>
     #endif
+    #include <wolfssl/openssl/ssl.h>
+    #include <wolfssl/error-ssl.h>
 #endif /* REALM_HAVE_WOLFSSL */
 
 #if REALM_HAVE_OPENSSL
-#include <openssl/ssl.h>
-#include <openssl/err.h>
+// oops
+// #include <openssl/ssl.h>
+//#include <openssl/err.h>
 #elif REALM_HAVE_SECURE_TRANSPORT
 #include <realm/util/cf_ptr.hpp>
 #include <Security/Security.h>

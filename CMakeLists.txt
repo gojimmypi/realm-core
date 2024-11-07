@@ -305,6 +305,7 @@ elseif(REALM_ENABLE_ENCRYPTION AND CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
     set(REALM_NEEDS_OPENSSL TRUE)
 endif()
 
+if(NOT REALM_HAVE_WOLFSSL)
 if(REALM_NEEDS_OPENSSL OR REALM_FORCE_OPENSSL)
     if(NOT REALM_USE_SYSTEM_OPENSSL AND (ANDROID OR WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
         # Use our own prebuilt OpenSSL
@@ -318,9 +319,11 @@ if(REALM_NEEDS_OPENSSL OR REALM_FORCE_OPENSSL)
     endif()
     find_package(OpenSSL REQUIRED)
     set(REALM_HAVE_OPENSSL ON)
+    message(STATUS "\nALERT: REALM_HAVE_OPENSSL set ON")
     string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" OPENSSL_VERSION_MAJOR_MINOR "${OPENSSL_VERSION}")
 elseif(APPLE)
     set(REALM_HAVE_SECURE_TRANSPORT "1")
+endif()
 endif()
 
 # Use Zlib for Sync, but allow integrators to override it
@@ -363,10 +366,15 @@ set(JSON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/json)
 include_directories(src)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src) # For generated files (like config.h)
 
+if (REALM_HAVE_WOLFSSL)
+    message(STATUS "Found REALM_HAVE_WOLFSSL")
+    include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr")
+endif()
+
 add_subdirectory(src)
 add_subdirectory(bindgen)
 
-# Install the licence and changelog files
+# Install the license and changelog files
 install(FILES LICENSE CHANGELOG.md DESTINATION "doc/realm" COMPONENT devel)
 
 # Only prepare test/install/package targets if we're not a submodule

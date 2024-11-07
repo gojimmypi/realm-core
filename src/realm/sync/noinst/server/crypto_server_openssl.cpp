@@ -11,14 +11,14 @@
     #endif
 #endif /* REALM_HAVE_WOLFSSL */
 
-#include <openssl/bio.h>
-#include <openssl/pem.h>
-#include <openssl/evp.h>
+#include <wolfssl/openssl/bio.h>
+#include <wolfssl/openssl/pem.h>
+#include <wolfssl/openssl/evp.h>
 
 #if OPENSSL_VERSION_MAJOR >= 3
-#include <openssl/decoder.h>
+#include <wolfssl/openssl/decoder.h>
 #else
-#include <openssl/rsa.h>
+#include <wolfssl/openssl/rsa.h>
 #endif
 
 using namespace realm;

@@ -65,8 +65,10 @@ public:
     #endif
 #endif /* REALM_HAVE_WOLFSSL */
 
-#include <openssl/sha.h>
-#include <openssl/evp.h>
+// #include <openssl/sha.h>
+// #include <openssl/evp.h>
+#include <wolfssl/openssl/evp.h>
+#include <wolfssl/openssl/sha.h>
 #endif
 
 namespace realm::util {
