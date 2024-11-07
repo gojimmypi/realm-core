@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 message(STATUS "CMake version: ${CMAKE_VERSION}")
-
+set(CMAKE_SYSTEM_VERSION 10.0.22621.0)
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "")
 project(RealmCore)
 
@@ -370,6 +370,10 @@ if (REALM_HAVE_WOLFSSL)
     message(STATUS "Found REALM_HAVE_WOLFSSL")
     include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr")
 endif()
+
+# TODO fix hard coded paths
+include_directories("/mnt/c/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/src")
+include_directories("/mnt/c/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/src/realm/object-store/c_api")
 
 add_subdirectory(src)
 add_subdirectory(bindgen)
