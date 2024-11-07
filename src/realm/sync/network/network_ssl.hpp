@@ -15,7 +15,14 @@
 #include <realm/util/optional.hpp>
 #include <realm/util/logger.hpp>
 
-#if REALM_HAVE_WOLFSSL
+#if REALM_HAVE_OPENSSL && REALM_HAVE_WOLFSSL
+    #error "Both OpenSSL and wolfSSL enabled. Pick one."
+#endif
+
+#if REALM_HAVE_OPENSSL
+    #include <openssl/ssl.h>
+    #include <openssl/err.h>
+#elif REALM_HAVE_WOLFSSL
     #ifdef HAVE_CONFIG_H
         #include <config.h>
     #endif
@@ -26,19 +33,13 @@
     #endif
     #include <wolfssl/openssl/ssl.h>
     #include <wolfssl/error-ssl.h>
-#endif /* REALM_HAVE_WOLFSSL */
 
-#if REALM_HAVE_OPENSSL
-// oops
-// #include <openssl/ssl.h>
-//#include <openssl/err.h>
 #elif REALM_HAVE_SECURE_TRANSPORT
-#include <realm/util/cf_ptr.hpp>
-#include <Security/Security.h>
-#include <Security/SecureTransport.h>
+    #include <realm/util/cf_ptr.hpp>
+    #include <Security/Security.h>
+    #include <Security/SecureTransport.h>
 
-#define REALM_HAVE_KEYCHAIN_APIS (TARGET_OS_MAC && !TARGET_OS_IPHONE)
-
+    #define REALM_HAVE_KEYCHAIN_APIS (TARGET_OS_MAC && !TARGET_OS_IPHONE)
 #endif
 
 // FIXME: Add necessary support for customizing the SSL server and client

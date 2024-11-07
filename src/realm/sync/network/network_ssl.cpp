@@ -7,21 +7,26 @@
 #include <realm/sync/network/network_ssl.hpp>
 
 #if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <pthread.h>
-#endif
-#include <wolfssl/openssl/conf.h>
-#include <wolfssl/openssl/x509v3.h>
-#if REALM_HAVE_WOLFSSL
-    #pragma message "network_ssl.cpp found REALM_HAVE_WOLFSSL"
-    //#include <openssl/ssl.h>
-    #include <wolfssl/openssl/ssl.h>
-#endif
+    #ifdef _WIN32
+        #include <Windows.h>
+    #else
+        #include <pthread.h>
+    #endif
+
+    #if REALM_HAVE_OPENSSL
+        #include <openssl/ssl.h>
+        #include <openssl/conf.h>
+        #include <openssl/x509v3.h>
+    #endif
+    #if REALM_HAVE_WOLFSSL
+        // #pragma message "network_ssl.cpp found REALM_HAVE_WOLFSSL"
+        #include <wolfssl/openssl/ssl.h>
+        #include <wolfssl/openssl/conf.h>
+        #include <wolfssl/openssl/x509v3.h>
+    #endif
 #elif REALM_HAVE_SECURE_TRANSPORT
-#include <fstream>
-#include <vector>
+    #include <fstream>
+    #include <vector>
 #endif
 
 using namespace realm;
@@ -129,10 +134,12 @@ OpensslInit::~OpensslInit()
     CRYPTO_cleanup_all_ex_data();
     CONF_modules_unload(1);
 #if REALM_HAVE_WOLFSSL
-    printf("Calling wolfSSL_Cleanup")
+    // TODO remove breadcrumb
+    printf("Calling wolfSSL_Cleanup");
     wolfSSL_Cleanup();
 #else
-    printf("REALM_HAVE_WOLFSSL not defined")
+    // TODO remove breadcrumb
+    printf("REALM_HAVE_WOLFSSL not defined");
 #endif
 }
 
