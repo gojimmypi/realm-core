@@ -6,6 +6,10 @@
 #include <realm/util/features.h>
 #include <realm/sync/network/network_ssl.hpp>
 
+#if REALM_HAVE_OPENSSL && REALM_HAVE_WOLFSSL
+    #error "Both OpenSSL and wolfSSL enabled. Pick one."
+#endif
+
 #if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
     #ifdef _WIN32
         #include <Windows.h>
