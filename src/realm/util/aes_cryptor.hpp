@@ -46,15 +46,16 @@ public:
 
 #if REALM_ENABLE_ENCRYPTION
 
+#if REALM_HAVE_OPENSSL && REALM_HAVE_WOLFSSL
+    #error "Both OpenSSL and wolfSSL enabled. Pick one."
+#endif
+
 #if REALM_PLATFORM_APPLE
-#include <CommonCrypto/CommonCrypto.h>
-#elif defined(_WIN32)
-#include <windows.h>
-#include <stdio.h>
-#include <bcrypt.h>
-#pragma comment(lib, "bcrypt.lib")
-#else
-#if REALM_HAVE_WOLFSSL
+    #include <CommonCrypto/CommonCrypto.h>
+#elif REALM_HAVE_OPENSSL
+    #include <openssl/sha.h>
+    #include <openssl/evp.h>
+#elif REALM_HAVE_WOLFSSL
     #ifdef HAVE_CONFIG_H
         #include <config.h>
     #endif
@@ -63,12 +64,16 @@ public:
     #else
         #include <wolfssl/wolfcrypt/settings.h>
     #endif
-#endif /* REALM_HAVE_WOLFSSL */
+    #include <wolfssl/openssl/evp.h>
+    #include <wolfssl/openssl/sha.h>
+#elif defined(_WIN32)
+    #include <windows.h>
+    #include <stdio.h>
+    #include <bcrypt.h>
+    #pragma comment(lib, "bcrypt.lib")
+#else
+    #error "No AES cryptographic provider found"
 
-// #include <openssl/sha.h>
-// #include <openssl/evp.h>
-#include <wolfssl/openssl/evp.h>
-#include <wolfssl/openssl/sha.h>
 #endif
 
 namespace realm::util {
