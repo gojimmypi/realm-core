@@ -380,7 +380,7 @@ endif()
 
 if(REALM_ENABLE_ENCRYPTION AND UNIX AND NOT APPLE AND (REALM_HAVE_OPENSSL OR REALM_HAVE_WOLFSSL))
     if (REALM_HAVE_WOLFSSL)
-        target_link_libraries(Storage PUBLIC "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+        target_link_libraries(Storage PUBLIC "${REALM_WOLFSSL_LIB}")
     elseif (REALM_HAVE_OPENSSL)
         target_link_libraries(Storage PUBLIC OpenSSL::Crypto)
     endif()

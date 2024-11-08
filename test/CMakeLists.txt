@@ -149,10 +149,10 @@ file(GLOB REQUIRED_TEST_FILES
 
 add_library(CoreTestLib OBJECT ${CORE_TESTS} ${REQUIRED_TEST_FILES} ${REALM_TEST_HEADERS})
 enable_stdfilesystem(CoreTestLib)
-target_link_libraries(CoreTestLib QueryParser "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+target_link_libraries(CoreTestLib QueryParser "${REALM_WOLFSSL_LIB}")
 
 add_executable(CoreTests main.cpp test_all.cpp ${REQUIRED_TEST_FILES})
-target_link_libraries(CoreTests CoreTestLib TestUtil "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+target_link_libraries(CoreTests CoreTestLib TestUtil "${REALM_WOLFSSL_LIB}")
 set_target_resources(CoreTests "${REQUIRED_TEST_FILES}")
 set_target_properties(CoreTests PROPERTIES
     OUTPUT_NAME "realm-tests"
@@ -182,7 +182,7 @@ enable_stdfilesystem(CoreTests)
 
 if(UNIX AND NOT APPLE)
     # This enables symbols in backtraces
-    target_link_libraries(CoreTests "-rdynamic" "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+    target_link_libraries(CoreTests "-rdynamic" "${REALM_WOLFSSL_LIB}")
 endif()
 
 target_include_directories(CoreTests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -243,18 +243,18 @@ if(REALM_ENABLE_SYNC)
 
     add_library(SyncTestLib OBJECT ${SYNC_TESTS} ${SYNC_TEST_HEADERS} ${SYNC_TEST_RESOURCES})
     enable_stdfilesystem(SyncTestLib)
-    target_link_libraries(SyncTestLib Sync SyncServer Storage "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+    target_link_libraries(SyncTestLib Sync SyncServer Storage "${REALM_WOLFSSL_LIB}")
 
     add_executable(SyncTests main.cpp test_all.cpp ${SYNC_TEST_RESOURCES})
     set_target_properties(SyncTests PROPERTIES OUTPUT_NAME "realm-sync-tests")
     set_target_resources(SyncTests "${SYNC_TEST_RESOURCES}")
     enable_stdfilesystem(SyncTests)
-    target_link_libraries(SyncTests SyncTestLib TestUtil "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+    target_link_libraries(SyncTests SyncTestLib TestUtil "${REALM_WOLFSSL_LIB}")
     add_bundled_test(SyncTests)
 
     if(UNIX AND NOT APPLE)
         # This enables symbols in backtraces
-        target_link_libraries(SyncTests "-rdynamic" "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+        target_link_libraries(SyncTests "-rdynamic" "${REALM_WOLFSSL_LIB}")
     endif()
 endif()
 
@@ -275,15 +275,15 @@ if(WINDOWS_STORE)
 endif()
 
 if(REALM_ENABLE_SYNC)
-    target_link_libraries(CombinedTests ObjectStoreTestLib CoreTestLib SyncTestLib TestUtil "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+    target_link_libraries(CombinedTests ObjectStoreTestLib CoreTestLib SyncTestLib TestUtil "${REALM_WOLFSSL_LIB}")
 else()
-    target_link_libraries(CombinedTests ObjectStoreTestLib CoreTestLib TestUtil "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+    target_link_libraries(CombinedTests ObjectStoreTestLib CoreTestLib TestUtil "${REALM_WOLFSSL_LIB}")
 endif()
 
 enable_stdfilesystem(CombinedTests)
 
 if(UNIX AND NOT APPLE)
     # This enables symbols in backtraces
-    target_link_libraries(CombinedTests "-rdynamic" "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
+    target_link_libraries(CombinedTests "-rdynamic" "${REALM_WOLFSSL_LIB}")
 endif()
 
