@@ -8,14 +8,14 @@ set_target_properties(RealmImporter PROPERTIES
     OUTPUT_NAME "realm-importer"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
-target_link_libraries(RealmImporter Storage "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
+target_link_libraries(RealmImporter Storage "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
 
 if(NOT APPLE AND NOT ANDROID AND NOT CMAKE_SYSTEM_NAME MATCHES "^Windows")
     add_executable(RealmDaemon realmd.cpp)
     set_target_properties(RealmDaemon PROPERTIES
         OUTPUT_NAME "realmd"
         DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
-    target_link_libraries(RealmDaemon Storage "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
+    target_link_libraries(RealmDaemon Storage "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
     list(APPEND ExecTargetsToInstall RealmDaemon)
 endif()
 
@@ -24,7 +24,7 @@ set_target_properties(RealmTrawler PROPERTIES
     OUTPUT_NAME "realm-trawler"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
-target_link_libraries(RealmTrawler Storage "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
+target_link_libraries(RealmTrawler Storage "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
 if (EMSCRIPTEN)
     set_target_properties(RealmTrawler PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
@@ -45,7 +45,7 @@ set_target_properties(RealmDecrypt PROPERTIES
     OUTPUT_NAME "realm-decrypt"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
-target_link_libraries(RealmDecrypt Storage "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
+target_link_libraries(RealmDecrypt Storage "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
 if (NOT REALM_ENABLE_ENCRYPTION)
     set_target_properties(RealmDecrypt PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
@@ -55,14 +55,14 @@ set_target_properties(RealmEncrypt PROPERTIES
     OUTPUT_NAME "realm-encrypt"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
-target_link_libraries(RealmEncrypt Storage "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
+target_link_libraries(RealmEncrypt Storage "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
 
 add_executable(RealmBrowser realm_browser.cpp)
 set_target_properties(RealmBrowser PROPERTIES
     OUTPUT_NAME "realm-browser-10"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
-target_link_libraries(RealmBrowser Storage "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
+target_link_libraries(RealmBrowser Storage "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
 
 if(REALM_ENABLE_SYNC)
 add_executable(Realm2JSON realm2json.cpp )
@@ -70,7 +70,7 @@ set_target_properties(Realm2JSON PROPERTIES
     OUTPUT_NAME "realm2json"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
-target_link_libraries(Realm2JSON Storage QueryParser Sync "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
+target_link_libraries(Realm2JSON Storage QueryParser Sync "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.a")
 list(APPEND ExecTargetsToInstall Realm2JSON)
 endif()
 
