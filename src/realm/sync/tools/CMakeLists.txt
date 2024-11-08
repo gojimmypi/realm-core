@@ -10,7 +10,7 @@ include_directories("/mnt/c/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/s
 
 link_directories("/home/gojimmypi/wolfssl-install-dir") # Adjust as needed for the exact path to the compiled libwolfssl.a or libwolfssl.so
 
-include_directories("/home/gojimmypi/wolfssl-install-dir/include")  # Adjust if needed
+include_directories("/home/gojimmypi/wolfssl-install-dir/include")
 link_directories("/home/gojimmypi/wolfssl-install-dir/lib")
 
 add_executable(InspectorInspectClientRealm "inspect_client_realm.cpp")

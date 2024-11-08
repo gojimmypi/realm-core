@@ -1,7 +1,7 @@
 add_subdirectory(util)
 add_custom_target(benchmarks)
 add_subdirectory(object-store)
-include_directories("/home/gojimmypi/wolfssl-install-dir/include")  # Adjust if needed
+include_directories("/home/gojimmypi/wolfssl-install-dir/include")
 link_directories("/home/gojimmypi/wolfssl-install-dir/lib")
 
 # AFL and LIBFUZZER not yet supported by Windows

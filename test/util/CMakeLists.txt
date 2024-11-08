@@ -50,14 +50,14 @@ if(REALM_ENABLE_SYNC)
     )
 endif()
 
-add_library(TestUtil STATIC ${TEST_UTIL_SOURCES} ${TEST_UTIL_HEADERS})
+add_library(TestUtil STATIC ${TEST_UTIL_SOURCES} ${TEST_UTIL_HEADERS} "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
 
-target_link_libraries(TestUtil Storage)
+target_link_libraries(TestUtil Storage "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
 
 if(UNIX AND NOT APPLE)
     find_library(LIBRT rt)
     if(LIBRT)
-        target_link_libraries(TestUtil ${LIBRT})
+        target_link_libraries(TestUtil ${LIBRT} "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.a")
     # Android has librt included in libc
     elseif(NOT ANDROID)
         message(WARNING "librt was not found. This means that the benchmarks will not be able to link properly.")
