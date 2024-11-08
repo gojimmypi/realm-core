@@ -1,3 +1,10 @@
+
+if(REALM_HAVE_WOLFSSL)
+    message(STATUS "test cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+else()
+    message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
+endif()
+
 add_subdirectory(util)
 add_custom_target(benchmarks)
 add_subdirectory(object-store)

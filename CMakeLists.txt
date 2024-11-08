@@ -305,24 +305,27 @@ elseif(REALM_ENABLE_ENCRYPTION AND CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
     set(REALM_NEEDS_OPENSSL TRUE)
 endif()
 
-if(NOT REALM_HAVE_WOLFSSL)
-if(REALM_NEEDS_OPENSSL OR REALM_FORCE_OPENSSL)
-    if(NOT REALM_USE_SYSTEM_OPENSSL AND (ANDROID OR WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
-        # Use our own prebuilt OpenSSL
-        realm_acquire_dependency(openssl ${DEP_OPENSSL_VERSION} OPENSSL_CMAKE_INCLUDE_FILE)
+if(REALM_HAVE_WOLFSSL)
+    # Allow users to specify their wolfSSL installation directory
+    message(STATUS "Main cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+else()
+    if(REALM_NEEDS_OPENSSL OR REALM_FORCE_OPENSSL)
+        if(NOT REALM_USE_SYSTEM_OPENSSL AND (ANDROID OR WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+            # Use our own prebuilt OpenSSL
+            realm_acquire_dependency(openssl ${DEP_OPENSSL_VERSION} OPENSSL_CMAKE_INCLUDE_FILE)
 
-        include(${OPENSSL_CMAKE_INCLUDE_FILE})
-    endif()
+            include(${OPENSSL_CMAKE_INCLUDE_FILE})
+        endif()
 
-    if(NOT DEFINED OPENSSL_USE_STATIC_LIBS)
-        set(OPENSSL_USE_STATIC_LIBS ON)
+        if(NOT DEFINED OPENSSL_USE_STATIC_LIBS)
+            set(OPENSSL_USE_STATIC_LIBS ON)
+        endif()
+        find_package(OpenSSL REQUIRED)
+        set(REALM_HAVE_OPENSSL ON)
+        string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" OPENSSL_VERSION_MAJOR_MINOR "${OPENSSL_VERSION}")
+    elseif(APPLE)
+        set(REALM_HAVE_SECURE_TRANSPORT "1")
     endif()
-    find_package(OpenSSL REQUIRED)
-    set(REALM_HAVE_OPENSSL ON)
-    string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" OPENSSL_VERSION_MAJOR_MINOR "${OPENSSL_VERSION}")
-elseif(APPLE)
-    set(REALM_HAVE_SECURE_TRANSPORT "1")
-endif()
 endif()
 
 # Use Zlib for Sync, but allow integrators to override it

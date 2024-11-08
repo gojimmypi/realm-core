@@ -1,7 +1,11 @@
-if (REALM_HAVE_WOLFSSL)
+if(REALM_HAVE_WOLFSSL)
+    message(STATUS "tools cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
     message(STATUS "Found REALM_HAVE_WOLFSSL")
+
     include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr")
     include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr/wolfcrypt")
+else()
+    message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
 endif()
 
 # TODO fix hard coded paths

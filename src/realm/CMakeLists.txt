@@ -1,3 +1,6 @@
+if(REALM_HAVE_WOLFSSL)
+    message(STATUS "realm cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+endif()
 set(REALM_SOURCES
     # slowest to compile first
     query.cpp

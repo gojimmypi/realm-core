@@ -617,7 +617,8 @@ inline void Context::use_verify_file(const std::string& path)
 inline void Context::use_included_certificate_roots()
 {
     std::error_code ec;
-    ssl_use_included_certificate_roots(ec);
+// TODO not disabled
+    // ssl_use_included_certificate_roots(ec);
     if (ec) {
         throw std::system_error(ec);
     }

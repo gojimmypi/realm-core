@@ -1,3 +1,9 @@
+if(REALM_HAVE_WOLFSSL)
+    message(STATUS "util cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+else()
+    message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
+endif()
+
 set(TEST_UTIL_SOURCES
     benchmark_results.cpp
     crypt_key.cpp

@@ -1,3 +1,9 @@
+if(REALM_HAVE_WOLFSSL)
+    message(STATUS "sync cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+else()
+    message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
+endif()
+
 set(SYNC_SOURCES
     config.cpp
     noinst/changeset_index.cpp
