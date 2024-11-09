@@ -1,15 +1,16 @@
 
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "test cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+    link_directories("${REALM_WOLFSSL_ROOT_DIR}/lib")
 else()
+    set(REALM_WOLFSSL_LIB "")
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
 endif()
 
 add_subdirectory(util)
 add_custom_target(benchmarks)
 add_subdirectory(object-store)
-include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
-link_directories("${REALM_WOLFSSL_ROOT_DIR}/lib")
 
 # AFL and LIBFUZZER not yet supported by Windows
 if(NOT CMAKE_SYSTEM_NAME MATCHES "^Windows" AND NOT EMSCRIPTEN AND NOT ANDROID)

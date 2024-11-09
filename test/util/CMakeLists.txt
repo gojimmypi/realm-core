@@ -1,6 +1,7 @@
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "util cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
 else()
+    set(REALM_WOLFSSL_LIB "")
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
 endif()
 

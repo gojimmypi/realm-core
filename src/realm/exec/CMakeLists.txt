@@ -2,8 +2,10 @@ if(REALM_HAVE_WOLFSSL)
     message(STATUS "exec cmake: ${REALM_WOLFSSL_ROOT_DIR}")
     message(STATUS "REALM_WOLFSSL_LIB=${REALM_WOLFSSL_LIB}")
 else()
+    set(REALM_WOLFSSL_LIB "")
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
 endif()
+
 add_executable(RealmImporter importer_tool.cpp importer.cpp importer.hpp)
 set_target_properties(RealmImporter PROPERTIES
     OUTPUT_NAME "realm-importer"
