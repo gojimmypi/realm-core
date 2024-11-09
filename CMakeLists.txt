@@ -379,13 +379,13 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/src) # For generated files (like
 
 if (REALM_HAVE_WOLFSSL)
     message(STATUS "Found REALM_HAVE_WOLFSSL")
-    include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr")
-    include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr/wolfcrypt")
+    message(STATUS "This REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+    message(STATUS "This RealmCore_SOURCE_DIR=${RealmCore_SOURCE_DIR}")
+    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
 endif()
 
 # TODO fix hard coded paths
-include_directories("/mnt/c/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/src")
-include_directories("/mnt/c/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/src/realm/object-store/c_api")
+# include_directories("${RealmCore_SOURCE_DIR}/src/realm/object-store/c_api")
 
 add_subdirectory(src)
 add_subdirectory(bindgen)

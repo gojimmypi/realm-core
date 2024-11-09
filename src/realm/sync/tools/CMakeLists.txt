@@ -2,20 +2,14 @@ if(REALM_HAVE_WOLFSSL)
     message(STATUS "tools cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
     message(STATUS "Found REALM_HAVE_WOLFSSL")
 
-    include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr")
-    include_directories("/mnt/c/workspace/wolfssl-gojimmypi-pr/wolfcrypt")
+    link_directories("${REALM_WOLFSSL_ROOT_DIR}/")
+    link_directories("${REALM_WOLFSSL_ROOT_DIR}/lib")
+
+    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
 else()
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
+    set(REALM_WOLFSSL_LIB "")
 endif()
-
-# TODO fix hard coded paths
-include_directories("/mnt/c/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/src")
-include_directories("/mnt/c/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/src/realm/object-store/c_api")
-
-link_directories("${REALM_WOLFSSL_ROOT_DIR}/") # Adjust as needed for the exact path to the compiled libwolfssl.a or libwolfssl.so
-
-include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
-link_directories("${REALM_WOLFSSL_ROOT_DIR}/lib")
 
 add_executable(InspectorInspectClientRealm "inspect_client_realm.cpp")
 set_target_properties(InspectorInspectClientRealm PROPERTIES
