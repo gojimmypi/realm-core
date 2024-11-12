@@ -150,6 +150,7 @@ file(GLOB REQUIRED_TEST_FILES
 
 add_library(CoreTestLib OBJECT ${CORE_TESTS} ${REQUIRED_TEST_FILES} ${REALM_TEST_HEADERS})
 enable_stdfilesystem(CoreTestLib)
+message(STATUS "CoreTestLib REALM_WOLFSSL_LIB=${REALM_WOLFSSL_LIB}")
 target_link_libraries(CoreTestLib QueryParser "${REALM_WOLFSSL_LIB}")
 
 add_executable(CoreTests main.cpp test_all.cpp ${REQUIRED_TEST_FILES})
@@ -246,6 +247,7 @@ if(REALM_ENABLE_SYNC)
     enable_stdfilesystem(SyncTestLib)
     target_link_libraries(SyncTestLib Sync SyncServer Storage "${REALM_WOLFSSL_LIB}")
 
+    message(STATUS "SyncTestLib REALM_WOLFSSL_LIB=${REALM_WOLFSSL_LIB}")
     add_executable(SyncTests main.cpp test_all.cpp ${SYNC_TEST_RESOURCES})
     set_target_properties(SyncTests PROPERTIES OUTPUT_NAME "realm-sync-tests")
     set_target_resources(SyncTests "${SYNC_TEST_RESOURCES}")
@@ -278,7 +280,7 @@ endif()
 if(REALM_ENABLE_SYNC)
     target_link_libraries(CombinedTests ObjectStoreTestLib CoreTestLib SyncTestLib TestUtil "${REALM_WOLFSSL_LIB}")
 else()
-    target_link_libraries(CombinedTests ObjectStoreTestLib CoreTestLib TestUtil "${REALM_WOLFSSL_LIB}")
+    target_link_libraries(CombinedTests ObjectStoreTestLib CoreTestLib             TestUtil "${REALM_WOLFSSL_LIB}")
 endif()
 
 enable_stdfilesystem(CombinedTests)
