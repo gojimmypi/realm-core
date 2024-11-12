@@ -169,7 +169,7 @@ private:
     void ssl_use_verify_file(const std::string& path, std::error_code&);
     void ssl_use_included_certificate_roots(std::error_code&);
 
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
     SSL_CTX* m_ssl_ctx = nullptr;
 
 #elif REALM_HAVE_SECURE_TRANSPORT
@@ -483,7 +483,7 @@ private:
     std::size_t ssl_read(char* buffer, std::size_t size, std::error_code&, Want& want) noexcept;
     std::size_t ssl_write(const char* data, std::size_t size, std::error_code&, Want& want) noexcept;
 
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
     class BioMethod;
     static BioMethod s_bio_method;
     SSL* m_ssl = nullptr;
@@ -617,8 +617,7 @@ inline void Context::use_verify_file(const std::string& path)
 inline void Context::use_included_certificate_roots()
 {
     std::error_code ec;
-// TODO not disabled
-    // ssl_use_included_certificate_roots(ec);
+    ssl_use_included_certificate_roots(ec);
     if (ec) {
         throw std::system_error(ec);
     }
@@ -1015,7 +1014,7 @@ inline Socket& Stream::lowest_layer() noexcept
     return m_tcp_socket;
 }
 
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
 
 inline void Stream::ssl_handshake(std::error_code& ec, Want& want) noexcept
 {

@@ -21,9 +21,8 @@
         #include <openssl/ssl.h>
         #include <openssl/conf.h>
         #include <openssl/x509v3.h>
-    #endif
-    #if REALM_HAVE_WOLFSSL
-        // #pragma message "network_ssl.cpp found REALM_HAVE_WOLFSSL"
+    #elif REALM_HAVE_WOLFSSL
+        #pragma message "network_ssl.cpp found REALM_HAVE_WOLFSSL"
         #include <wolfssl/openssl/ssl.h>
         #include <wolfssl/openssl/conf.h>
         #include <wolfssl/openssl/x509v3.h>
@@ -79,8 +78,7 @@ void populate_cert_store_with_included_certs(X509_STORE* store, std::error_code&
 #endif // REALM_INCLUDE_CERTS
 
 
-#if REALM_HAVE_WOLFSSL || \
-    (REALM_HAVE_OPENSSL && (OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)))
+#if REALM_HAVE_WOLFSSL || (REALM_HAVE_OPENSSL && (OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)))
 
 // These must be made to execute before main() is called, i.e., before there is
 // any chance of threads being spawned.
@@ -182,7 +180,7 @@ bool ErrorCategory::equivalent(const std::error_code& ec, int condition) const n
 {
     switch (Errors(condition)) {
         case Errors::tls_handshake_failed:
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
             return ec.category() == openssl_error_category;
 #elif REALM_HAVE_SECURE_TRANSPORT
             return ec.category() == secure_transport_error_category;
@@ -209,7 +207,7 @@ const char* OpensslErrorCategory::name() const noexcept
 std::string OpensslErrorCategory::message(int value) const
 {
     const char* message = "Unknown error";
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
     if (const char* s = ERR_reason_error_string(value))
         message = s;
 #endif
@@ -275,7 +273,7 @@ std::error_code Stream::shutdown(std::error_code& ec)
 }
 
 
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
 
 void Context::ssl_init()
 {
@@ -378,6 +376,7 @@ void Context::ssl_use_verify_file(const std::string& path, std::error_code& ec)
 }
 
 #if REALM_INCLUDE_CERTS
+#pragma message "ssl_use_included_certificate_roots"
 void Context::ssl_use_included_certificate_roots(std::error_code& ec)
 {
     X509_STORE* store = SSL_CTX_get_cert_store(m_ssl_ctx);
@@ -385,7 +384,7 @@ void Context::ssl_use_included_certificate_roots(std::error_code& ec)
 }
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER) && !defined(OPENSSL_IS_BORINGSSL)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER) && !defined(OPENSSL_IS_BORINGSSL))
 class Stream::BioMethod {
 public:
     BIO_METHOD* bio_method;
@@ -455,7 +454,7 @@ public:
 Stream::BioMethod Stream::s_bio_method;
 
 
-#if OPENSSL_VERSION_NUMBER < 0x10002000L || defined(LIBRESSL_VERSION_NUMBER)
+#if  REALM_HAVE_WOLFSSL || (OPENSSL_VERSION_NUMBER < 0x10002000L || defined(LIBRESSL_VERSION_NUMBER))
 
 namespace {
 
@@ -1464,6 +1463,9 @@ void Context::ssl_use_default_verify(std::error_code&) {}
 
 
 void Context::ssl_use_verify_file(const std::string&, std::error_code&) {}
+
+
+void Context::ssl_use_included_certificate_roots(std::error_code& ec) {}
 
 
 void Stream::ssl_set_verify_mode(VerifyMode, std::error_code&) {}
