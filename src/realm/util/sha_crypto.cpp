@@ -22,7 +22,7 @@
 
 #if REALM_PLATFORM_APPLE
     #include <CommonCrypto/CommonCrypto.h>
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(REALM_HAVE_WOLFSSL)
     #include <windows.h>
     #include <stdio.h>
     #include <bcrypt.h>
@@ -68,7 +68,8 @@ namespace {
 // guarantees that out_buffer is large enough, which is always possible for
 // message digests with a maximum output size.
 #if REALM_PLATFORM_APPLE
-#elif defined(_WIN32)
+    /* nothing ? */
+#elif defined(_WIN32) && !defined(REALM_HAVE_WOLFSSL)
 struct Algorithm {
     Algorithm(LPCWSTR alg_id)
     {
@@ -193,7 +194,7 @@ void sha1(const char* in_buffer, size_t in_buffer_size, unsigned char* out_buffe
 {
 #if REALM_PLATFORM_APPLE
     CC_SHA1(in_buffer, CC_LONG(in_buffer_size), out_buffer);
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(REALM_HAVE_WOLFSSL)
     Algorithm alg(BCRYPT_SHA1_ALGORITHM);
     Hash hash(alg, 20);
     hash.get_hash(reinterpret_cast<PUCHAR>(const_cast<char*>(in_buffer)), DWORD(in_buffer_size), out_buffer);
@@ -216,7 +217,7 @@ void sha256(const char* in_buffer, size_t in_buffer_size, unsigned char* out_buf
 {
 #if REALM_PLATFORM_APPLE
     CC_SHA256(in_buffer, CC_LONG(in_buffer_size), out_buffer);
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(REALM_HAVE_WOLFSSL)
     Algorithm alg(BCRYPT_SHA256_ALGORITHM);
     Hash hash(alg, 32);
     hash.get_hash(reinterpret_cast<PUCHAR>(const_cast<char*>(in_buffer)), DWORD(in_buffer_size), out_buffer);

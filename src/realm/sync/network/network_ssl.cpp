@@ -384,7 +384,8 @@ void Context::ssl_use_included_certificate_roots(std::error_code& ec)
 }
 #endif
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER) && !defined(OPENSSL_IS_BORINGSSL))
+#if !defined(REALM_HAVE_WOLFSSL) && (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER) &&       \
+                                 !defined(OPENSSL_IS_BORINGSSL))
 class Stream::BioMethod {
 public:
     BIO_METHOD* bio_method;

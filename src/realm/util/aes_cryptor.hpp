@@ -117,7 +117,7 @@ private:
 #if REALM_PLATFORM_APPLE
     CCCryptorRef m_encr;
     CCCryptorRef m_decr;
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(REALM_HAVE_WOLFSSL)
     BCRYPT_KEY_HANDLE m_aes_key_handle;
 #else
     EVP_CIPHER_CTX* m_ctx;
