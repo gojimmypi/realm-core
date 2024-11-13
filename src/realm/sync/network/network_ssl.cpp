@@ -22,7 +22,7 @@
         #include <openssl/conf.h>
         #include <openssl/x509v3.h>
     #elif REALM_HAVE_WOLFSSL
-        #pragma message "network_ssl.cpp found REALM_HAVE_WOLFSSL"
+        // #pragma message "network_ssl.cpp found REALM_HAVE_WOLFSSL"
         #include <wolfssl/openssl/ssl.h>
         #include <wolfssl/openssl/conf.h>
         #include <wolfssl/openssl/x509v3.h>
@@ -376,7 +376,7 @@ void Context::ssl_use_verify_file(const std::string& path, std::error_code& ec)
 }
 
 #if REALM_INCLUDE_CERTS
-#pragma message "ssl_use_included_certificate_roots"
+// #pragma message "ssl_use_included_certificate_roots"
 void Context::ssl_use_included_certificate_roots(std::error_code& ec)
 {
     X509_STORE* store = SSL_CTX_get_cert_store(m_ssl_ctx);

@@ -33,7 +33,7 @@
     #include <openssl/evp.h>
     #include <openssl/hmac.h>
 #elif REALM_HAVE_WOLFSSL
-    #pragma message "REALM_HAVE_WOLFSSL in sha_crypto"
+    // #pragma message "REALM_HAVE_WOLFSSL in sha_crypto"
     #ifdef HAVE_CONFIG_H
         #include <config.h>
     #endif
@@ -45,7 +45,7 @@
     #ifndef WOLFSSL_EVP_INCLUDED
         #error "WOLFSSL_EVP_INCLUDED needed"
     #else
-        #pragma message "sha_crypto WOLFSSL_EVP_INCLUDED"
+       // #pragma message "sha_crypto WOLFSSL_EVP_INCLUDED"
     #endif
     #include <wolfssl/openssl/sha.h>
     #include <wolfssl/openssl/evp.h>
