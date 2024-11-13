@@ -1,3 +1,6 @@
+  #  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl-gojimmypi-pr/DLL Release/x64" CACHE PATH "Path to the wolfSSL root directory")
+
+  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/Debug/x64" CACHE PATH "Path to the wolfSSL root directory")
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "util cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
 else()
