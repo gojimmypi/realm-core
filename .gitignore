@@ -38,7 +38,7 @@ CMakeScripts
 Thumbs.db
 
 # Ignore files build by Visual Studio
-/.vs
+**/.vs
 /Visual\ Studio
 
 # Ignore user-local configuration for Visual Studio Code
@@ -113,3 +113,6 @@ ssh_agent_commands.sh
 
 # Ignore breadcrumb / semaphore files
 /REALM_CORE_COMMIT_COMPLETE.log
+
+*.bak
+
