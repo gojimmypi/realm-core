@@ -111,7 +111,8 @@ ssh_agent_commands.sh
 # Ignore output build
 **/out/build/**
 
+# Ignore backup files
+*.bak
+
 # Ignore breadcrumb / semaphore files
 /REALM_CORE_COMMIT_COMPLETE.log
-
-*.bak
