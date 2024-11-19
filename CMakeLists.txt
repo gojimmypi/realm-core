@@ -316,7 +316,7 @@ if(REALM_ENABLE_SYNC)
     endif()
 elseif(REALM_ENABLE_ENCRYPTION AND CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
     if(REALM_HAVE_WOLFSSL)
-        message(STATUS "Found REALM_ENABLE_SYNC with REALM_HAVE_WOLFSSL"
+        message(STATUS "Found REALM_ENABLE_SYNC with REALM_HAVE_WOLFSSL")
     else()
         set(REALM_NEEDS_OPENSSL TRUE)
     endif()
