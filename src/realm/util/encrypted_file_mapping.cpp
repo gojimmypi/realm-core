@@ -168,7 +168,7 @@ AESCryptor::AESCryptor(const uint8_t* key)
     void* iv = u_iv;
     CCCryptorCreate(kCCEncrypt, kCCAlgorithmAES, 0 /* options */, key, kCCKeySizeAES256, iv, &m_encr);
     CCCryptorCreate(kCCDecrypt, kCCAlgorithmAES, 0 /* options */, key, kCCKeySizeAES256, iv, &m_decr);
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(REALM_HAVE_WOLFSSL)
     BCRYPT_ALG_HANDLE hAesAlg = NULL;
     int ret;
     ret = BCryptOpenAlgorithmProvider(&hAesAlg, BCRYPT_AES_ALGORITHM, NULL, 0);
@@ -528,7 +528,7 @@ void AESCryptor::crypt(EncryptionMode mode, off_t pos, char* dst, const char* sr
     CCCryptorStatus err = CCCryptorUpdate(cryptor, src, block_size, dst, block_size, &bytesEncrypted);
     REALM_ASSERT(err == kCCSuccess);
     REALM_ASSERT(bytesEncrypted == block_size);
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(REALM_HAVE_WOLFSSL)
     ULONG cbData;
     int i;
 

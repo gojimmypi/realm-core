@@ -1,3 +1,13 @@
+  #  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl-gojimmypi-pr/DLL Release/x64" CACHE PATH "Path to the wolfSSL root directory")
+
+  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/Debug/x64" CACHE PATH "Path to the wolfSSL root directory")
+if(REALM_HAVE_WOLFSSL)
+    message(STATUS "util cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+else()
+    set(REALM_WOLFSSL_LIB "")
+    message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
+endif()
+
 set(TEST_UTIL_SOURCES
     benchmark_results.cpp
     crypt_key.cpp
@@ -50,14 +60,14 @@ if(REALM_ENABLE_SYNC)
     )
 endif()
 
-add_library(TestUtil STATIC ${TEST_UTIL_SOURCES} ${TEST_UTIL_HEADERS})
+add_library(TestUtil STATIC ${TEST_UTIL_SOURCES} ${TEST_UTIL_HEADERS} "${REALM_WOLFSSL_LIB}")
 
-target_link_libraries(TestUtil Storage)
+target_link_libraries(TestUtil Storage "${REALM_WOLFSSL_LIB}")
 
 if(UNIX AND NOT APPLE)
     find_library(LIBRT rt)
     if(LIBRT)
-        target_link_libraries(TestUtil ${LIBRT})
+        target_link_libraries(TestUtil ${LIBRT} "${REALM_WOLFSSL_LIB}")
     # Android has librt included in libc
     elseif(NOT ANDROID)
         message(WARNING "librt was not found. This means that the benchmarks will not be able to link properly.")

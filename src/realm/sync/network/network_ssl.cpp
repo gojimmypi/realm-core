@@ -6,17 +6,30 @@
 #include <realm/util/features.h>
 #include <realm/sync/network/network_ssl.hpp>
 
-#if REALM_HAVE_OPENSSL
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <pthread.h>
+#if REALM_HAVE_OPENSSL && REALM_HAVE_WOLFSSL
+    #error "Both OpenSSL and wolfSSL enabled. Pick one."
 #endif
-#include <openssl/conf.h>
-#include <openssl/x509v3.h>
+
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
+    #ifdef _WIN32
+        #include <Windows.h>
+    #else
+        #include <pthread.h>
+    #endif
+
+    #if REALM_HAVE_OPENSSL
+        #include <openssl/ssl.h>
+        #include <openssl/conf.h>
+        #include <openssl/x509v3.h>
+    #elif REALM_HAVE_WOLFSSL
+        // #pragma message "network_ssl.cpp found REALM_HAVE_WOLFSSL"
+        #include <wolfssl/openssl/ssl.h>
+        #include <wolfssl/openssl/conf.h>
+        #include <wolfssl/openssl/x509v3.h>
+    #endif
 #elif REALM_HAVE_SECURE_TRANSPORT
-#include <fstream>
-#include <vector>
+    #include <fstream>
+    #include <vector>
 #endif
 
 using namespace realm;
@@ -65,7 +78,7 @@ void populate_cert_store_with_included_certs(X509_STORE* store, std::error_code&
 #endif // REALM_INCLUDE_CERTS
 
 
-#if REALM_HAVE_OPENSSL && (OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER))
+#if REALM_HAVE_WOLFSSL || (REALM_HAVE_OPENSSL && (OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)))
 
 // These must be made to execute before main() is called, i.e., before there is
 // any chance of threads being spawned.
@@ -122,9 +135,18 @@ OpensslInit::~OpensslInit()
     EVP_cleanup();
     CRYPTO_cleanup_all_ex_data();
     CONF_modules_unload(1);
+#if REALM_HAVE_WOLFSSL
+    // TODO remove breadcrumb
+    printf("Calling wolfSSL_Cleanup");
+    wolfSSL_Cleanup();
+#else
+    // TODO remove breadcrumb
+    printf("REALM_HAVE_WOLFSSL not defined");
+#endif
 }
 
-#endif // REALM_HAVE_OPENSSL && (OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER))
+#endif // REALM_HAVE_WOLFSSL || (REALM_HAVE_OPENSSL && (OPENSSL_VERSION_NUMBER < 0x10100000L ||
+       // defined(LIBRESSL_VERSION_NUMBER)))
 
 } // unnamed namespace
 
@@ -158,7 +180,7 @@ bool ErrorCategory::equivalent(const std::error_code& ec, int condition) const n
 {
     switch (Errors(condition)) {
         case Errors::tls_handshake_failed:
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
             return ec.category() == openssl_error_category;
 #elif REALM_HAVE_SECURE_TRANSPORT
             return ec.category() == secure_transport_error_category;
@@ -185,7 +207,7 @@ const char* OpensslErrorCategory::name() const noexcept
 std::string OpensslErrorCategory::message(int value) const
 {
     const char* message = "Unknown error";
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
     if (const char* s = ERR_reason_error_string(value))
         message = s;
 #endif
@@ -251,7 +273,7 @@ std::error_code Stream::shutdown(std::error_code& ec)
 }
 
 
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
 
 void Context::ssl_init()
 {
@@ -275,6 +297,11 @@ void Context::ssl_init()
     options |= SSL_OP_NO_SSLv3;
     options |= SSL_OP_NO_COMPRESSION;
     SSL_CTX_set_options(ssl_ctx, options);
+
+#if REALM_HAVE_WOLFSSL
+    // mimic default OpenSSL behavior
+    SSL_CTX_set_verify(ssl_ctx, static_cast<int>(VerifyMode::none), nullptr);
+#endif
 
     m_ssl_ctx = ssl_ctx;
 }
@@ -349,6 +376,7 @@ void Context::ssl_use_verify_file(const std::string& path, std::error_code& ec)
 }
 
 #if REALM_INCLUDE_CERTS
+// #pragma message "ssl_use_included_certificate_roots"
 void Context::ssl_use_included_certificate_roots(std::error_code& ec)
 {
     X509_STORE* store = SSL_CTX_get_cert_store(m_ssl_ctx);
@@ -356,7 +384,8 @@ void Context::ssl_use_included_certificate_roots(std::error_code& ec)
 }
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER) && !defined(OPENSSL_IS_BORINGSSL)
+#if !defined(REALM_HAVE_WOLFSSL) && (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER) &&       \
+                                 !defined(OPENSSL_IS_BORINGSSL))
 class Stream::BioMethod {
 public:
     BIO_METHOD* bio_method;
@@ -390,6 +419,16 @@ public:
 
     BioMethod()
     {
+#if REALM_HAVE_WOLFSSL
+        bio_method = new BIO_METHOD();
+        bio_method->type = WOLFSSL_BIO_UNDEF;       // byte type
+        bio_method->writeCb = &Stream::bio_write;   // int (*writeCb)(BIO*, const char*, int)
+        bio_method->readCb = &Stream::bio_read;     // int (*readCb)(BIO*, char*, int)
+        bio_method->putsCb = &Stream::bio_puts;     // int (*putsCb)(BIO*, const char*)
+        bio_method->ctrlCb = &Stream::bio_ctrl;     // long (*ctrlCb)(BIO*, int, long, void*)
+        bio_method->createCb = &Stream::bio_create; // int (*createCb)(BIO*)
+        bio_method->freeCb = &Stream::bio_destroy;  // int (*freeCb)(BIO*)
+#else
         bio_method = new BIO_METHOD{
             BIO_TYPE_SOCKET,      // int type
             nullptr,              // const char* name
@@ -402,6 +441,7 @@ public:
             &Stream::bio_destroy, // int (*destroy)(BIO*)
             nullptr               // long (*callback_ctrl)(BIO*, int, bio_info_cb*)
         };
+#endif
     }
 
     ~BioMethod()
@@ -415,7 +455,7 @@ public:
 Stream::BioMethod Stream::s_bio_method;
 
 
-#if OPENSSL_VERSION_NUMBER < 0x10002000L || defined(LIBRESSL_VERSION_NUMBER)
+#if  REALM_HAVE_WOLFSSL || (OPENSSL_VERSION_NUMBER < 0x10002000L || defined(LIBRESSL_VERSION_NUMBER))
 
 namespace {
 
@@ -475,7 +515,7 @@ bool check_san(X509* server_cert, const std::string& host_name)
 
         if (current_name->type == GEN_DNS) {
             // Current name is a DNS name
-            char* dns_name = static_cast<char*>(ASN1_STRING_data(current_name->d.dNSName));
+            char* dns_name = reinterpret_cast<char*>(ASN1_STRING_data(current_name->d.dNSName));
 
             // Make sure there isn't an embedded NUL character in the DNS name
             if (static_cast<std::size_t>(ASN1_STRING_length(current_name->d.dNSName)) != std::strlen(dns_name))
@@ -682,7 +722,9 @@ void Stream::ssl_init()
         throw std::system_error(ec);
     }
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if REALM_HAVE_WOLFSSL || \
+    OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
     BIO_set_data(bio, this);
 #else
     bio->ptr = this;
@@ -701,7 +743,9 @@ void Stream::ssl_destroy() noexcept
 
 int Stream::bio_write(BIO* bio, const char* data, int size) noexcept
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if REALM_HAVE_WOLFSSL || \
+    OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
     Stream& stream = *static_cast<Stream*>(BIO_get_data(bio));
 #else
     Stream& stream = *static_cast<Stream*>(bio->ptr);
@@ -725,7 +769,9 @@ int Stream::bio_write(BIO* bio, const char* data, int size) noexcept
 
 int Stream::bio_read(BIO* bio, char* buffer, int size) noexcept
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if REALM_HAVE_WOLFSSL || \
+    OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
     Stream& stream = *static_cast<Stream*>(BIO_get_data(bio));
 #else
     Stream& stream = *static_cast<Stream*>(bio->ptr);
@@ -784,7 +830,9 @@ long Stream::bio_ctrl(BIO*, int cmd, long, void*) noexcept
 
 int Stream::bio_create(BIO* bio) noexcept
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if REALM_HAVE_WOLFSSL || \
+    OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
     BIO_set_init(bio, 1);
     BIO_set_data(bio, nullptr);
     BIO_clear_flags(bio, 0);
@@ -1416,6 +1464,9 @@ void Context::ssl_use_default_verify(std::error_code&) {}
 
 
 void Context::ssl_use_verify_file(const std::string&, std::error_code&) {}
+
+
+void Context::ssl_use_included_certificate_roots(std::error_code& ec) {}
 
 
 void Stream::ssl_set_verify_mode(VerifyMode, std::error_code&) {}

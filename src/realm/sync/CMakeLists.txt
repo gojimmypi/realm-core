@@ -1,3 +1,10 @@
+if(REALM_HAVE_WOLFSSL)
+    message(STATUS "sync cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+else()
+    set(REALM_WOLFSSL_LIB "")
+    message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
+endif()
+
 set(SYNC_SOURCES
     config.cpp
     noinst/changeset_index.cpp
@@ -103,7 +110,11 @@ target_link_libraries(Sync PUBLIC Storage)
 
 if(APPLE AND NOT REALM_FORCE_OPENSSL)
     target_link_options(Sync INTERFACE "SHELL:-framework Security")
+elseif(REALM_HAVE_WOLFSSL)
+    message(STATUS "Sync found REALM_HAVE_WOLFSSL")
+    target_link_libraries(Sync PUBLIC "${REALM_WOLFSSL_LIB}")
 elseif(REALM_HAVE_OPENSSL)
+    message(STATUS "Sync found REALM_HAVE_OPENSSL")
     target_link_libraries(Sync PUBLIC OpenSSL::SSL)
 endif()
 
@@ -111,7 +122,7 @@ if(WIN32 AND NOT WINDOWS_STORE)
     target_link_libraries(Sync INTERFACE Version.lib)
     if(CMAKE_VERSION VERSION_LESS "3.21")
         # This is needed for OpenSSL, but CMake's FindOpenSSL didn't declare it
-        # on the OpenSSL::Crypto target until CMake 3.21.0. 
+        # on the OpenSSL::Crypto target until CMake 3.21.0.
         target_link_libraries(Sync INTERFACE Crypt32.lib)
     endif()
 endif()

@@ -1,6 +1,18 @@
 cmake_minimum_required(VERSION 3.15)
-message(STATUS "CMake version: ${CMAKE_VERSION}")
 
+if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    message(STATUS "Visual Studio Build")
+    add_compile_definitions(WOLFSSL_LIB)
+    add_compile_definitions(WOLFSSL_USER_SETTINGS)
+    option(REALM_INCLUDE_CERTS "Include certs in Realm" ON)
+    option(REALM_ENABLE_ENCRYPTION "Enable encryption in Realm" ON)
+    option(REALM_ENABLE_SYNC "Enable sync in Realm" ON)
+    option(REALM_HAVE_WOLFSSL "Enable wolfSSL in Realm" OFF)
+   #  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/out/build/x64-Debug" CACHE PATH "Path to the wolfSSL root directory")
+endif()
+
+message(STATUS "CMake version: ${CMAKE_VERSION}")
+set(CMAKE_SYSTEM_VERSION 10.0.22621.0)
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "")
 project(RealmCore)
 
@@ -305,22 +317,47 @@ elseif(REALM_ENABLE_ENCRYPTION AND CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
     set(REALM_NEEDS_OPENSSL TRUE)
 endif()
 
-if(REALM_NEEDS_OPENSSL OR REALM_FORCE_OPENSSL)
-    if(NOT REALM_USE_SYSTEM_OPENSSL AND (ANDROID OR WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
-        # Use our own prebuilt OpenSSL
-        realm_acquire_dependency(openssl ${DEP_OPENSSL_VERSION} OPENSSL_CMAKE_INCLUDE_FILE)
-
-        include(${OPENSSL_CMAKE_INCLUDE_FILE})
+if(REALM_HAVE_WOLFSSL)
+    if(REALM_INCLUDE_CERTS)
+        message(STATUS "Found REALM_INCLUDE_CERTS")
     endif()
-
-    if(NOT DEFINED OPENSSL_USE_STATIC_LIBS)
-        set(OPENSSL_USE_STATIC_LIBS ON)
+    if(REALM_ENABLE_SYNC)
+        message(STATUS "Found REALM_ENABLE_SYNC")
+        option(REALM_INCLUDE_CERTS "Include a list of trust certificates in the build for OpenSSL certificate verification" ON)
     endif()
-    find_package(OpenSSL REQUIRED)
-    set(REALM_HAVE_OPENSSL ON)
-    string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" OPENSSL_VERSION_MAJOR_MINOR "${OPENSSL_VERSION}")
-elseif(APPLE)
-    set(REALM_HAVE_SECURE_TRANSPORT "1")
+    # Allow users to specify their wolfSSL installation directory
+    message(STATUS "Main cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    find_library(REALM_WOLFSSL_LIB NAMES wolfssl PATHS "${REALM_WOLFSSL_ROOT_DIR}")
+else()
+    find_library(REALM_WOLFSSL_LIB NAMES wolfssl PATHS "${REALM_WOLFSSL_ROOT_DIR}/lib")
+endif()
+    message(STATUS "REALM_WOLFSSL_LIB=${REALM_WOLFSSL_LIB}")
+    if(EXISTS "${REALM_WOLFSSL_LIB}")
+        message(STATUS "Found wolfssl lib file: ${REALM_WOLFSSL_LIB}")
+    else()
+        message(WARNING "File does not exist: ${REALM_WOLFSSL_LIB}")
+    endif()
+else()
+    set(REALM_WOLFSSL_LIB "" CACHE PATH "wolfSSL is not used when REALM_HAVE_WOLFSSL is not set.")
+    message(STATUS "Main cmake: Not using wolfSSL! (REALM_HAVE_WOLFSSL not enabled); REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+    if(REALM_NEEDS_OPENSSL OR REALM_FORCE_OPENSSL)
+        if(NOT REALM_USE_SYSTEM_OPENSSL AND (ANDROID OR WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+            # Use our own prebuilt OpenSSL
+            realm_acquire_dependency(openssl ${DEP_OPENSSL_VERSION} OPENSSL_CMAKE_INCLUDE_FILE)
+
+            include(${OPENSSL_CMAKE_INCLUDE_FILE})
+        endif()
+
+        if(NOT DEFINED OPENSSL_USE_STATIC_LIBS)
+            set(OPENSSL_USE_STATIC_LIBS ON)
+        endif()
+        find_package(OpenSSL REQUIRED)
+        set(REALM_HAVE_OPENSSL ON)
+        string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" OPENSSL_VERSION_MAJOR_MINOR "${OPENSSL_VERSION}")
+    elseif(APPLE)
+        set(REALM_HAVE_SECURE_TRANSPORT "1")
+    endif()
 endif()
 
 # Use Zlib for Sync, but allow integrators to override it
@@ -363,10 +400,20 @@ set(JSON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/json)
 include_directories(src)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src) # For generated files (like config.h)
 
+if (REALM_HAVE_WOLFSSL)
+    message(STATUS "Found REALM_HAVE_WOLFSSL")
+    message(STATUS "This REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+    message(STATUS "This RealmCore_SOURCE_DIR=${RealmCore_SOURCE_DIR}")
+    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+endif()
+
+# TODO fix hard coded paths
+# include_directories("${RealmCore_SOURCE_DIR}/src/realm/object-store/c_api")
+
 add_subdirectory(src)
 add_subdirectory(bindgen)
 
-# Install the licence and changelog files
+# Install the license and changelog files
 install(FILES LICENSE CHANGELOG.md DESTINATION "doc/realm" COMPONENT devel)
 
 # Only prepare test/install/package targets if we're not a submodule
