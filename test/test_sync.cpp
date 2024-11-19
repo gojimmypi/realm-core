@@ -2778,7 +2778,7 @@ TEST(Sync_SSL_Certificate_DER)
 #endif // REALM_HAVE_SECURE_TRANSPORT
 
 
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
 
 // This test checks that the SSL connection is accepted if the verify callback
 // always returns true.
