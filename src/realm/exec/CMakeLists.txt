@@ -1,6 +1,24 @@
+message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+
+
+# add_library(wolfssl STATIC IMPORTED)
+add_compile_definitions(WOLFSSL_USER_SETTINGS)
+link_directories("/workspace/wolfssl/DLL Debug/x64")
+include_directories("/workspace/wolfssl/wolfssl" "/workspace/wolfssl" "/workspace/wolfssl/IDE/WIN")
+set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+set(REALM_WOLFSSL_LIB "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "exec cmake: ${REALM_WOLFSSL_ROOT_DIR}")
     message(STATUS "REALM_WOLFSSL_LIB=${REALM_WOLFSSL_LIB}")
+    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+    include_directories("/workspace/wolfssl/wolfssl" "/workspace/wolfssl" "/workspace/wolfssl/IDE/WIN")
+
+    set_target_properties(wolfssl PROPERTIES
+        IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+
+    #link_directories("${REALM_WOLFSSL_ROOT_DIR}/lib")
+    link_directories("/workspace/wolfssl/DLL Debug/x64")
 else()
     set(REALM_WOLFSSL_LIB "")
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
@@ -11,6 +29,13 @@ set_target_properties(RealmImporter PROPERTIES
     OUTPUT_NAME "realm-importer"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
+target_include_directories(RealmImporter PRIVATE
+    /workspace/wolfssl
+    /workspace/wolfssl/IDE/WIN
+    C:/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/src
+    C:/workspace/osp-gojimmypi/realm/VS2022/src
+)
+message(STATUS "RealmImporter wolfssl: ${REALM_WOLFSSL_LIB}")
 target_link_libraries(RealmImporter Storage "${REALM_WOLFSSL_LIB}")
 
 if(NOT APPLE AND NOT ANDROID AND NOT CMAKE_SYSTEM_NAME MATCHES "^Windows")
@@ -37,7 +62,7 @@ set_target_properties(RealmEnumerate PROPERTIES
     OUTPUT_NAME "realm-enumerate"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
-target_link_libraries(RealmEnumerate ObjectStore )
+target_link_libraries(RealmEnumerate ObjectStore "${REALM_WOLFSSL_LIB}")
 # FIXME can be fixed for others, but requires link and install fixes for libuv target
 if (NOT APPLE)
     set_target_properties(RealmEnumerate PROPERTIES EXCLUDE_FROM_ALL TRUE)

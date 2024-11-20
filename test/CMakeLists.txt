@@ -1,8 +1,27 @@
+message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+
+
+# add_library(wolfssl STATIC IMPORTED)
+add_compile_definitions(WOLFSSL_USER_SETTINGS)
+link_directories("/workspace/wolfssl/DLL Debug/x64")
+include_directories("/workspace/wolfssl/wolfssl" "/workspace/wolfssl" "/workspace/wolfssl/IDE/WIN")
+set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+set(REALM_WOLFSSL_LIB "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
 
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "test cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
     include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
-    link_directories("${REALM_WOLFSSL_ROOT_DIR}/lib")
+    include_directories("/workspace/wolfssl/wolfssl" "/workspace/wolfssl" "/workspace/wolfssl/IDE/WIN")
+
+    set_target_properties(wolfssl PROPERTIES
+        IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+
+    #link_directories("${REALM_WOLFSSL_ROOT_DIR}/lib")
+    link_directories("/workspace/wolfssl/DLL Debug/x64")
+
+    # target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE wolfssl)
+
+
 else()
     set(REALM_WOLFSSL_LIB "")
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")

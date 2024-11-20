@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
+set(REALM_HAVE_WOLFSSL 1)
+message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     message(STATUS "Visual Studio Build")
@@ -9,7 +11,56 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     option(REALM_ENABLE_SYNC "Enable sync in Realm" ON)
     option(REALM_HAVE_OPENSSL "Disable OpenSSL in Realm" OFF)
     option(REALM_HAVE_WOLFSSL "Enable wolfSSL in Realm" ON)
+
+    include_directories("/workspace/wolfssl/wolfssl" "/workspace/wolfssl" "/workspace/wolfssl/IDE/WIN")
+
+    link_directories("/workspace/wolfssl/DLL Debug/x64")
+# set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+    set(REALM_WOLFSSL_LIB "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+
+# new
+    message(STATUS "test cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+
+
+    if(NOT TARGET wolfssl)
+        message(STATUS ">>> add library wolfSSL! (root realm cmake file)")
+        add_library(wolfssl STATIC IMPORTED)
+        set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+    else()
+        message(STATUS ">>> Skip library wolfSSL! already found.")
+    endif()
+#end new
+
+    link_directories("/workspace/wolfssl/DLL Debug/x64")
+    if(0)
+        add_subdirectory("C:/workspace/wolfssl" "build/wolfssl")
+        # target_link_libraries(realm-benchmark-sync PUBLIC wolfssl)
+        # set(wolfssl_DIR "/workspace/osp-gojimmypi/realm/VS2022/build/wolfssl")
+        # set(wolfssl_DIR "/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/out/build/x64-Debug/build/wolfssl")
+        set(wolfssl_DIR "/workspace/wolfssl/out/build/x64-Debug")
+
+        find_package(wolfssl REQUIRED)
+        # target_link_libraries(realm-benchmark-sync PRIVATE wolfSSL::wolfssl)
+        # target_include_directories(your_project PRIVATE "/workspace/wolfssl")
+    endif()
+
+
+    if(0)
+        include_directories("/workspace/wolfssl")
+
+        # add_library(wolfssl STATIC IMPORTED)
+        set_target_properties(wolfssl PROPERTIES
+        IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+    endif()
+    include(ExternalProject)
+
+    include_external_msproject(wolfssl "C:/workspace/wolfssl/wolfssl-VS2022.vcxproj" )
+
+
    #  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/out/build/x64-Debug" CACHE PATH "Path to the wolfSSL root directory")
+else()
+    message(ERROR "not VS!")
 endif()
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
@@ -358,6 +409,7 @@ else()
             set(OPENSSL_USE_STATIC_LIBS ON)
         endif()
         find_package(OpenSSL REQUIRED)
+        message(ERROR "REALM_HAVE_OPENSSL ON")
         set(REALM_HAVE_OPENSSL ON)
         string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" OPENSSL_VERSION_MAJOR_MINOR "${OPENSSL_VERSION}")
     elseif(APPLE)
@@ -389,6 +441,8 @@ if(NOT APPLE AND NOT EMSCRIPTEN AND NOT TARGET ZLIB::ZLIB)
 endif()
 
 # Store configuration in header file
+set(REALM_HAVE_OPENSSL 0)
+set(REALM_HAVE_WOLFSSL 1)
 configure_file(src/realm/util/config.h.in src/realm/util/config.h)
 
 # Configure source code to use right version number

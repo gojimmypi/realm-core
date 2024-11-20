@@ -1,6 +1,8 @@
   #  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl-gojimmypi-pr/DLL Release/x64" CACHE PATH "Path to the wolfSSL root directory")
+  # TODO needed?
+    set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/DLL Debug/x64" CACHE PATH "Path to the wolfSSL root directory")
+    include_directories("/workspace/wolfssl")
 
-  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/Debug/x64" CACHE PATH "Path to the wolfSSL root directory")
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "util cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
 else()
@@ -60,7 +62,7 @@ if(REALM_ENABLE_SYNC)
     )
 endif()
 
-add_library(TestUtil STATIC ${TEST_UTIL_SOURCES} ${TEST_UTIL_HEADERS} "${REALM_WOLFSSL_LIB}")
+add_library(TestUtil STATIC ${TEST_UTIL_SOURCES} ${TEST_UTIL_HEADERS})
 
 target_link_libraries(TestUtil Storage "${REALM_WOLFSSL_LIB}")
 
