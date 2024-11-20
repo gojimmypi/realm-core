@@ -11,7 +11,7 @@ set(REALM_WOLFSSL_LIB "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "exec cmake: ${REALM_WOLFSSL_ROOT_DIR}")
     message(STATUS "REALM_WOLFSSL_LIB=${REALM_WOLFSSL_LIB}")
-    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+
     include_directories("/workspace/wolfssl/wolfssl" "/workspace/wolfssl" "/workspace/wolfssl/IDE/WIN")
 
     set_target_properties(wolfssl PROPERTIES

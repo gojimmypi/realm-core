@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 set(REALM_HAVE_WOLFSSL 1)
 message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 
+# root realm cmake file
+message(STATUS "hi")
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     message(STATUS "Visual Studio Build")
     add_compile_definitions(WOLFSSL_LIB)
@@ -15,30 +17,30 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     include_directories("/workspace/wolfssl/wolfssl" "/workspace/wolfssl" "/workspace/wolfssl/IDE/WIN")
 
     link_directories("/workspace/wolfssl/DLL Debug/x64")
-# set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
     set(REALM_WOLFSSL_LIB "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
 
 # new
-    message(STATUS "test cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
-    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+    message(STATUS "root cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
 
+    # find_package(WolfSSL REQUIRED)
 
     if(NOT TARGET wolfssl)
         message(STATUS ">>> add library wolfSSL! (root realm cmake file)")
         add_library(wolfssl STATIC IMPORTED)
         set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+        # link_directories("/workspace/wolfssl/DLL Debug/x64")
     else()
         message(STATUS ">>> Skip library wolfSSL! already found.")
     endif()
 #end new
 
     link_directories("/workspace/wolfssl/DLL Debug/x64")
-    if(0)
-        add_subdirectory("C:/workspace/wolfssl" "build/wolfssl")
+   if(0)
+#       add_subdirectory("C:/workspace/wolfssl" "build/wolfssl")
         # target_link_libraries(realm-benchmark-sync PUBLIC wolfssl)
         # set(wolfssl_DIR "/workspace/osp-gojimmypi/realm/VS2022/build/wolfssl")
         # set(wolfssl_DIR "/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/out/build/x64-Debug/build/wolfssl")
-        set(wolfssl_DIR "/workspace/wolfssl/out/build/x64-Debug")
+#       set(wolfssl_DIR "/workspace/wolfssl/out/build/x64-Debug")
 
         find_package(wolfssl REQUIRED)
         # target_link_libraries(realm-benchmark-sync PRIVATE wolfSSL::wolfssl)
@@ -463,7 +465,7 @@ if (REALM_HAVE_WOLFSSL)
     message(STATUS "Found REALM_HAVE_WOLFSSL")
     message(STATUS "This REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
     message(STATUS "This RealmCore_SOURCE_DIR=${RealmCore_SOURCE_DIR}")
-    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+
 endif()
 
 # TODO fix hard coded paths
