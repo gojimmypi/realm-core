@@ -1,10 +1,31 @@
 cmake_minimum_required(VERSION 3.15)
 set(REALM_HAVE_WOLFSSL 1)
 message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/DLL Debug/x64" CACHE PATH "Path to the wolfSSL root directory")
 
 # root realm cmake file
-message(STATUS "hi")
+message(STATUS "hi there!")
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    set(WOLFSSL_BREADCRUMB ON)
+    message(STATUS "File version 0007")
+    if(WOLFSSL_BREADCRUMB)
+        message(STATUS "Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
+        message(STATUS "REALM_HAVE_WOLFSSL:${REALM_HAVE_WOLFSSL}")
+        if(REALM_HAVE_WOLFSSL)
+            message(STATUS "Proper have wolfSSL")
+        else()
+            message(STATUS "NO have wolfSSL")
+        endif()
+        message(STATUS "REALM_HAVE_OPENSSL:${REALM_HAVE_OPENSSL}")
+        if(REALM_HAVE_OPENSSL)
+            message(STATUS "Proper have OpenSSL")
+        else()
+            message(STATUS "NO have OpenSSL")
+        endif()
+    else()
+        message(STATUS "NOT Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
+    endif()
+
     message(STATUS "Visual Studio Build")
     add_compile_definitions(WOLFSSL_LIB)
     add_compile_definitions(WOLFSSL_USER_SETTINGS)
@@ -28,40 +49,21 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
         message(STATUS ">>> add library wolfSSL! (root realm cmake file)")
         add_library(wolfssl STATIC IMPORTED)
         set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
-        # link_directories("/workspace/wolfssl/DLL Debug/x64")
     else()
         message(STATUS ">>> Skip library wolfSSL! already found.")
     endif()
 #end new
 
     link_directories("/workspace/wolfssl/DLL Debug/x64")
-   if(0)
-#       add_subdirectory("C:/workspace/wolfssl" "build/wolfssl")
-        # target_link_libraries(realm-benchmark-sync PUBLIC wolfssl)
-        # set(wolfssl_DIR "/workspace/osp-gojimmypi/realm/VS2022/build/wolfssl")
-        # set(wolfssl_DIR "/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/out/build/x64-Debug/build/wolfssl")
-#       set(wolfssl_DIR "/workspace/wolfssl/out/build/x64-Debug")
-
-        find_package(wolfssl REQUIRED)
-        # target_link_libraries(realm-benchmark-sync PRIVATE wolfSSL::wolfssl)
-        # target_include_directories(your_project PRIVATE "/workspace/wolfssl")
-    endif()
-
-
     if(0)
-        include_directories("/workspace/wolfssl")
-
-        # add_library(wolfssl STATIC IMPORTED)
-        set_target_properties(wolfssl PROPERTIES
-        IMPORTED_LOCATION "/workspace/wolfssl/DLL Debug/x64/wolfssl.lib")
+        find_package(wolfssl REQUIRED)
     endif()
+
+    # Import wolfSSL project
     include(ExternalProject)
-
     include_external_msproject(wolfssl "C:/workspace/wolfssl/wolfssl-VS2022.vcxproj" )
-
-
-   #  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/out/build/x64-Debug" CACHE PATH "Path to the wolfSSL root directory")
 else()
+    # TODO we don't actually want an error here!
     message(ERROR "not VS!")
 endif()
 

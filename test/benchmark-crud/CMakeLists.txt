@@ -1,4 +1,11 @@
 message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+    if(WOLFSSL_BREADCRUMB)
+        message(STATUS "Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
+        message(STATUS "REALM_HAVE_WOLFSSL:${REALM_HAVE_WOLFSSL}")
+        message(STATUS "REALM_HAVE_OPENSSL:${REALM_HAVE_OPENSSL}")
+    else()
+        message(STATUS "NOT Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
+    endif()
 
 
 # add_library(wolfssl STATIC IMPORTED)
