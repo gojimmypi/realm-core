@@ -5,12 +5,7 @@ set_target_properties(RealmImporter PROPERTIES
     OUTPUT_NAME "realm-importer"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
-#target_include_directories(RealmImporter PRIVATE
-#    /workspace/wolfssl
-#    /workspace/wolfssl/IDE/WIN
-#    C:/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/src
-#    C:/workspace/osp-gojimmypi/realm/VS2022/src
-#)
+
 message(STATUS "RealmImporter wolfssl: ${REALM_WOLFSSL_LIB_D3}")
 target_link_libraries(RealmImporter Storage "${REALM_WOLFSSL_LIB_D3}")
 
