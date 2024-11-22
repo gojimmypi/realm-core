@@ -1,15 +1,4 @@
 if(REALM_ENABLE_SYNC)
-
-if(0)
-    add_subdirectory("/workspace/wolfssl" "build/wolfssl")
-    # target_link_libraries(realm-benchmark-sync PUBLIC wolfssl)
-    # set(wolfssl_DIR "/workspace/osp-gojimmypi/realm/VS2022/build/wolfssl")
-    # set(wolfssl_DIR "/workspace/osp-gojimmypi/realm/realm-core-gojimmypi/out/build/x64-Debug/build/wolfssl")
-    set(wolfssl_DIR "/workspace/wolfssl/DLL Debug/x64")
-    find_package(wolfssl REQUIRED)
-    # target_link_libraries(realm-benchmark-sync PRIVATE wolfSSL::wolfssl)
-    # target_include_directories(realm-benchmark-sync PRIVATE "/workspace/wolfssl")
-endif()
     add_executable(realm-benchmark-sync bench_transform.cpp ../test_all.cpp)
     add_dependencies(benchmarks realm-benchmark-sync)
     # Sync lib is included with SyncServer

@@ -7,7 +7,7 @@ set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/DLL Debug/x64" CACHE PATH "Path t
 message(STATUS "hi there!")
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     set(WOLFSSL_BREADCRUMB ON)
-    message(STATUS "File version 0007")
+    message(STATUS "File version 0008")
     if(WOLFSSL_BREADCRUMB)
         message(STATUS "Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
         message(STATUS "REALM_HAVE_WOLFSSL:${REALM_HAVE_WOLFSSL}")
