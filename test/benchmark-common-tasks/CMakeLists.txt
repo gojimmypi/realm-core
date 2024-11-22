@@ -13,6 +13,6 @@ else()
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
 endif()
 
-target_link_libraries(realm-benchmark-common-tasks TestUtil QueryParser ${REALM_WOLFSSL_LIB})
+target_link_libraries(realm-benchmark-common-tasks TestUtil QueryParser ${REALM_WOLFSSL_LIB_D3})
 
 add_dependencies(benchmarks realm-benchmark-common-tasks)

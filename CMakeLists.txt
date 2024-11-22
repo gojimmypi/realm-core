@@ -6,8 +6,8 @@ set(THIS_OUTPUT_DIRECTORY "../VS2022/Debug/x64")
 get_filename_component(THIS_ABSOLUTE_PATH "${THIS_OUTPUT_DIRECTORY}" ABSOLUTE)
 
 message(STATUS "THIS_OUTPUT_DIRECTORY: ${THIS_OUTPUT_DIRECTORY}")
-message(STATUS "THIS_OUTPUT_DIRECTORY: ${THIS_ABSOLUTE_PATH}")
-set(THIS_OUTPUT_DIRECTORY "${THIS_ABSOLUTE_PATH}")
+message(STATUS "THIS_ABSOLUTE_PATH: ${THIS_ABSOLUTE_PATH}")
+# set(THIS_OUTPUT_DIRECTORY "${THIS_ABSOLUTE_PATH}")
 message(STATUS "THIS_OUTPUT_DIRECTORY: ${THIS_OUTPUT_DIRECTORY}")
 
 
@@ -54,7 +54,11 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     include_directories("/workspace/wolfssl/wolfssl" "/workspace/wolfssl" "c:/workspace/wolfssl/IDE/WIN")
 
     link_directories("${THIS_OUTPUT_DIRECTORY}")
-    set(REALM_WOLFSSL_LIB "${THIS_OUTPUT_DIRECTORY}/wolfssl.lib")
+    set(REALM_WOLFSSL_LIB             "${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D1       "../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D2    "../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D3 "../../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+
 # new
     message(STATUS "root cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
 

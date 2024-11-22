@@ -63,7 +63,7 @@ endif()
 
 add_library(TestUtil STATIC ${TEST_UTIL_SOURCES} ${TEST_UTIL_HEADERS})
 
-target_link_libraries(TestUtil Storage "${REALM_WOLFSSL_LIB}")
+target_link_libraries(TestUtil Storage)
 
 if(UNIX AND NOT APPLE)
     find_library(LIBRT rt)

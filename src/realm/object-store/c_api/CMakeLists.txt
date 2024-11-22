@@ -1,6 +1,6 @@
 message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 
-message(STATUS "REALM_WOLFSSL_LIB wolfssl: ${REALM_WOLFSSL_LIB}")
+message(STATUS "REALM_WOLFSSL_LIB wolfssl: ${REALM_WOLFSSL_LIB_D4}")
 set(REALM_FFI_SOURCES
     ../../../realm.h
 
@@ -43,8 +43,8 @@ add_library(RealmFFIStatic STATIC ${REALM_FFI_SOURCES})
 target_compile_definitions(RealmFFI PRIVATE -DRealm_EXPORTS)
 target_compile_definitions(RealmFFIStatic PUBLIC -DRLM_NO_DLLIMPORT)
 
-target_link_libraries(RealmFFI PRIVATE Storage ObjectStore QueryParser "${REALM_WOLFSSL_LIB}")
-target_link_libraries(RealmFFIStatic PRIVATE Storage ObjectStore QueryParser "${REALM_WOLFSSL_LIB}")
+target_link_libraries(RealmFFI PRIVATE Storage ObjectStore QueryParser "${REALM_WOLFSSL_LIB_D4}")
+target_link_libraries(RealmFFIStatic PRIVATE Storage ObjectStore QueryParser "${REALM_WOLFSSL_LIB_D4}")
 
 if (${REALM_ENABLE_SYNC})
     target_link_libraries(RealmFFI PRIVATE Sync)
