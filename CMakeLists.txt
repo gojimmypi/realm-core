@@ -27,8 +27,8 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
         set(WOLFSSL_ROOT "/workspace/wolfssl")
         message(STATUS "Set default WOLFSSL_ROOT=${WOLFSSL_ROOT}")
     endif()
-    set(WOLFSSL_BREADCRUMB ON)
-    message(STATUS "File version 0016")
+
+    message(STATUS "File version 0017")
     if(WOLFSSL_BREADCRUMB)
         message(STATUS "Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
         message(STATUS "REALM_HAVE_WOLFSSL:${REALM_HAVE_WOLFSSL}")
@@ -92,7 +92,6 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     # Import wolfSSL Visual Studio project.
     # Project is assumed to have defined WOLFSSL_USER_SETTINGS WOLFSSL_LIB, etc.
     include(ExternalProject)
-    set(WOLFSSL_MACROS "/DWOLFSSL_USER_SETTINGS" "/DMY_WOLFSSL_BREADCRUMB=1")
     include_external_msproject(wolfssl  "./wolfssl-VS2022-cmake.vcxproj" )
 
     # Optional pre-build project steps could go here
