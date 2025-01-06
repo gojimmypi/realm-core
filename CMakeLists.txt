@@ -1,14 +1,110 @@
 cmake_minimum_required(VERSION 3.15)
+set(REALM_HAVE_WOLFSSL 1)
+message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 
+set(THIS_OUTPUT_DIRECTORY "../VS2022/Debug/x64")
+get_filename_component(THIS_ABSOLUTE_PATH "${THIS_OUTPUT_DIRECTORY}" ABSOLUTE)
+
+message(STATUS "THIS_OUTPUT_DIRECTORY: ${THIS_OUTPUT_DIRECTORY}")
+message(STATUS "THIS_ABSOLUTE_PATH: ${THIS_ABSOLUTE_PATH}")
+# set(THIS_OUTPUT_DIRECTORY "${THIS_ABSOLUTE_PATH}")
+message(STATUS "THIS_OUTPUT_DIRECTORY: ${THIS_OUTPUT_DIRECTORY}")
+
+# C:\workspace\osp-gojimmypi\realm\VS2022\Debug\x64\wolfssl.lib
+set(REALM_WOLFSSL_ROOT_DIR "${THIS_OUTPUT_DIRECTORY}" CACHE PATH "Path to the wolfSSL root directory")
+
+message(STATUS "WOLFSSL_ROOT=${WOLFSSL_ROOT}")
+message(STATUS "WOLFSSL_USER_SETTINGS_DIRECTORY=${WOLFSSL_USER_SETTINGS_DIRECTORY}")
+
+# root realm cmake file
+set(VS_ROOT "TBD" CACHE STRING "Custom variable for VS_ROOT")
+message(STATUS "")
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    if("${WOLFSSL_ROOT}")
+        message(STATUS "Using WOLFSSL_ROOT=${WOLFSSL_ROOT}")
+    else()
+        set(WOLFSSL_ROOT "/workspace/wolfssl")
+        message(STATUS "Set default WOLFSSL_ROOT=${WOLFSSL_ROOT}")
+    endif()
+    set(WOLFSSL_BREADCRUMB ON)
+    message(STATUS "File version 0016")
+    if(WOLFSSL_BREADCRUMB)
+        message(STATUS "Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
+        message(STATUS "REALM_HAVE_WOLFSSL:${REALM_HAVE_WOLFSSL}")
+        if(REALM_HAVE_WOLFSSL)
+            message(STATUS "Proper have wolfSSL")
+        else()
+            message(STATUS "NO have wolfSSL")
+        endif()
+        message(STATUS "REALM_HAVE_OPENSSL:${REALM_HAVE_OPENSSL}")
+        if(REALM_HAVE_OPENSSL)
+            message(STATUS "Proper have OpenSSL")
+        else()
+            message(STATUS "NO have OpenSSL")
+        endif()
+    else()
+        message(STATUS "NOT Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
+    endif()
+
     message(STATUS "Visual Studio Build")
     add_compile_definitions(WOLFSSL_LIB)
     add_compile_definitions(WOLFSSL_USER_SETTINGS)
     option(REALM_INCLUDE_CERTS "Include certs in Realm" ON)
     option(REALM_ENABLE_ENCRYPTION "Enable encryption in Realm" ON)
     option(REALM_ENABLE_SYNC "Enable sync in Realm" ON)
-    option(REALM_HAVE_WOLFSSL "Enable wolfSSL in Realm" OFF)
-   #  set(REALM_WOLFSSL_ROOT_DIR "/workspace/wolfssl/out/build/x64-Debug" CACHE PATH "Path to the wolfSSL root directory")
+    option(REALM_HAVE_OPENSSL "Disable OpenSSL in Realm" OFF)
+    option(REALM_HAVE_WOLFSSL "Enable wolfSSL in Realm" ON)
+    message(STATUS "new paths:")
+
+    # This line will adjust project file Additional Include Files contents with VS variable, not cmake!:
+    set(THIS_PARENT_DIRECTORY_WRK ${CMAKE_CURRENT_SOURCE_DIR}/../)
+    get_filename_component(THIS_PARENT_DIRECTORY "${THIS_PARENT_DIRECTORY_WRK}" ABSOLUTE)
+    message(STATUS "THIS_PARENT_DIRECTORY=${THIS_PARENT_DIRECTORY}")
+
+    # Visual Studio project file variables cannot be "seen" here.
+    # "${THIS_PARENT_DIRECTORY}/VS2022/include" here is equivalent to
+    #                  "$(SolutionDir)/include" in the Visual Studio project file.
+    include_directories("${THIS_PARENT_DIRECTORY}/VS2022/include" "${WOLFSSL_ROOT}/wolfssl" "${WOLFSSL_ROOT}")
+
+    link_directories("${THIS_OUTPUT_DIRECTORY}")
+    set(REALM_WOLFSSL_LIB             "${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D1       "../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D2    "../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D3 "../../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+
+    message(STATUS "root cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+
+    if(0)
+        find_package(wolfssl REQUIRED)
+    endif()
+
+    if(NOT TARGET wolfssl)
+        message(STATUS ">>> add library wolfSSL! (root realm cmake file)")
+        add_library(wolfssl STATIC IMPORTED)
+
+    else()
+        message(STATUS ">>> Skip library wolfSSL! already found.")
+    endif()
+
+    link_directories("${THIS_OUTPUT_DIRECTORY}")
+
+    # Import wolfSSL Visual Studio project.
+    # Project is assumed to have defined WOLFSSL_USER_SETTINGS WOLFSSL_LIB, etc.
+    include(ExternalProject)
+    set(WOLFSSL_MACROS "/DWOLFSSL_USER_SETTINGS" "/DMY_WOLFSSL_BREADCRUMB=1")
+    include_external_msproject(wolfssl  "./wolfssl-VS2022-cmake.vcxproj" )
+
+    # Optional pre-build project steps could go here
+    if(0)
+        add_custom_target(wolfssl_prepare ALL
+            COMMAND ${CMAKE_COMMAND} -E echo "Updating environment..."
+            # Additional steps here
+        )
+    endif()
+
+    set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "${THIS_OUTPUT_DIRECTORY}/wolfssl.Lib")
+else()
+    message(STATUS "Found CMAKE_GENERATOR that is NOT Visual Studio: ${CMAKE_GENERATOR}")
 endif()
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
@@ -314,7 +410,11 @@ if(REALM_ENABLE_SYNC)
         option(REALM_INCLUDE_CERTS "Include a list of trust certificates in the build for OpenSSL certificate verification" ON)
     endif()
 elseif(REALM_ENABLE_ENCRYPTION AND CMAKE_SYSTEM_NAME MATCHES "Linux|Android")
-    set(REALM_NEEDS_OPENSSL TRUE)
+    if(REALM_HAVE_WOLFSSL)
+        message(STATUS "Found REALM_ENABLE_SYNC with REALM_HAVE_WOLFSSL")
+    else()
+        set(REALM_NEEDS_OPENSSL TRUE)
+    endif()
 endif()
 
 if(REALM_HAVE_WOLFSSL)
@@ -327,11 +427,11 @@ if(REALM_HAVE_WOLFSSL)
     endif()
     # Allow users to specify their wolfSSL installation directory
     message(STATUS "Main cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
-if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-    find_library(REALM_WOLFSSL_LIB NAMES wolfssl PATHS "${REALM_WOLFSSL_ROOT_DIR}")
-else()
-    find_library(REALM_WOLFSSL_LIB NAMES wolfssl PATHS "${REALM_WOLFSSL_ROOT_DIR}/lib")
-endif()
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+        find_library(REALM_WOLFSSL_LIB NAMES wolfssl PATHS "${REALM_WOLFSSL_ROOT_DIR}")
+    else()
+        find_library(REALM_WOLFSSL_LIB NAMES wolfssl PATHS "${REALM_WOLFSSL_ROOT_DIR}/lib")
+    endif()
     message(STATUS "REALM_WOLFSSL_LIB=${REALM_WOLFSSL_LIB}")
     if(EXISTS "${REALM_WOLFSSL_LIB}")
         message(STATUS "Found wolfssl lib file: ${REALM_WOLFSSL_LIB}")
@@ -353,6 +453,7 @@ else()
             set(OPENSSL_USE_STATIC_LIBS ON)
         endif()
         find_package(OpenSSL REQUIRED)
+        message(ERROR "REALM_HAVE_OPENSSL ON")
         set(REALM_HAVE_OPENSSL ON)
         string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" OPENSSL_VERSION_MAJOR_MINOR "${OPENSSL_VERSION}")
     elseif(APPLE)
@@ -384,6 +485,8 @@ if(NOT APPLE AND NOT EMSCRIPTEN AND NOT TARGET ZLIB::ZLIB)
 endif()
 
 # Store configuration in header file
+set(REALM_HAVE_OPENSSL 0)
+set(REALM_HAVE_WOLFSSL 1)
 configure_file(src/realm/util/config.h.in src/realm/util/config.h)
 
 # Configure source code to use right version number
@@ -404,7 +507,7 @@ if (REALM_HAVE_WOLFSSL)
     message(STATUS "Found REALM_HAVE_WOLFSSL")
     message(STATUS "This REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
     message(STATUS "This RealmCore_SOURCE_DIR=${RealmCore_SOURCE_DIR}")
-    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+
 endif()
 
 # TODO fix hard coded paths

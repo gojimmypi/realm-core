@@ -1,3 +1,5 @@
+message("Current CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+
 add_subdirectory(realm)
 add_subdirectory(external/IntelRDFPMathLib20U2)
 

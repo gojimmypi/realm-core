@@ -1,3 +1,4 @@
+message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "realm cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
 endif()

@@ -426,7 +426,7 @@ TEST(Util_Network_SSL_PrematureEndOfInputOnHandshakeRead)
 
     std::thread thread(std::move(consumer));
 
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
     CHECK_SYSTEM_ERROR(ssl_stream_2.handshake(), MiscExtErrors::premature_end_of_input);
 #elif REALM_HAVE_SECURE_TRANSPORT
     // We replace the CHECK_SYSTEM_ERROR check for "premature end of input"
@@ -1070,7 +1070,7 @@ TEST(Util_Network_SSL_Certificate_SAN)
 
 // FIXME: Verification of peer against Common Name is no longer supported in
 // Catalina (macOS).
-#if REALM_HAVE_OPENSSL || !REALM_HAVE_SECURE_TRANSPORT
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL || !REALM_HAVE_SECURE_TRANSPORT
 
 // The host name www.example.com is contained in Common Name but not in SAN.
 TEST(Util_Network_SSL_Certificate_CN)
@@ -1114,7 +1114,7 @@ TEST(Util_Network_SSL_Certificate_CN)
     thread_2.join();
 }
 
-#endif // REALM_HAVE_OPENSSL || !REALM_HAVE_SECURE_TRANSPORT
+#endif // REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL || !REALM_HAVE_SECURE_TRANSPORT
 
 // The ip address is contained in the IP SAN section
 // of the certificate. For OpenSSL, we expect failure because we only
@@ -1148,7 +1148,7 @@ TEST(Util_Network_SSL_Certificate_IP)
     auto connector = [&] {
         std::error_code ec;
         ssl_stream_2.handshake(ec);
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
         CHECK_NOT_EQUAL(std::error_code(), ec);
 #elif REALM_HAVE_SECURE_TRANSPORT
         CHECK_EQUAL(std::error_code(), ec);
@@ -1157,7 +1157,7 @@ TEST(Util_Network_SSL_Certificate_IP)
     auto acceptor = [&] {
         std::error_code ec;
         ssl_stream_1.handshake(ec);
-#if REALM_HAVE_OPENSSL
+#if REALM_HAVE_OPENSSL || REALM_HAVE_WOLFSSL
         CHECK_NOT_EQUAL(std::error_code(), ec);
 #elif REALM_HAVE_SECURE_TRANSPORT
         CHECK_EQUAL(std::error_code(), ec);

@@ -1,3 +1,7 @@
+message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+
+message(STATUS "REALM_WOLFSSL_LIB wolfssl: ${REALM_WOLFSSL_LIB}")
+
 add_executable(realm-benchmark-common-tasks main.cpp)
 
 if(REALM_HAVE_WOLFSSL)
@@ -9,6 +13,6 @@ else()
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
 endif()
 
-target_link_libraries(realm-benchmark-common-tasks TestUtil QueryParser ${REALM_WOLFSSL_LIB})
+target_link_libraries(realm-benchmark-common-tasks TestUtil QueryParser ${REALM_WOLFSSL_LIB_D3})
 
 add_dependencies(benchmarks realm-benchmark-common-tasks)

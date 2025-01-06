@@ -5,7 +5,7 @@ if(REALM_HAVE_WOLFSSL)
     link_directories("${REALM_WOLFSSL_ROOT_DIR}/")
     link_directories("${REALM_WOLFSSL_ROOT_DIR}/lib")
 
-    include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
+    #include_directories("${REALM_WOLFSSL_ROOT_DIR}/include")
 else()
     message(STATUS "WARNING: REALM_HAVE_WOLFSSL not set")
     set(REALM_WOLFSSL_LIB "")
