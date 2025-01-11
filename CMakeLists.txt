@@ -1,28 +1,41 @@
 cmake_minimum_required(VERSION 3.15)
-set(REALM_HAVE_WOLFSSL 1)
-message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+if(REALM_HAVE_WOLFSSL AND REALM_HAVE_OPENSSL)
+    message(FATAL_ERROR "Found both REALM_HAVE_WOLFSSL and REALM_HAVE_OPENSSL. Pick one")
+else()
+    # Optionally force wolfSSL
+    # set(REALM_HAVE_WOLFSSL 1)
+    message(STATUS "REALM_HAVE_WOLFSSL: $(REALM_HAVE_WOLFSSL)")
+    message(STATUS "REALM_HAVE_OPENSSL: $(REALM_HAVE_OPENSSL)")
+endif()
+message(STATUS "\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 
 set(THIS_OUTPUT_DIRECTORY "../VS2022/Debug/x64")
 get_filename_component(THIS_ABSOLUTE_PATH "${THIS_OUTPUT_DIRECTORY}" ABSOLUTE)
 
-message(STATUS "THIS_OUTPUT_DIRECTORY: ${THIS_OUTPUT_DIRECTORY}")
-message(STATUS "THIS_ABSOLUTE_PATH: ${THIS_ABSOLUTE_PATH}")
-# set(THIS_OUTPUT_DIRECTORY "${THIS_ABSOLUTE_PATH}")
+message(STATUS "THIS_ABSOLUTE_PATH:    ${THIS_ABSOLUTE_PATH}")
 message(STATUS "THIS_OUTPUT_DIRECTORY: ${THIS_OUTPUT_DIRECTORY}")
 
-# C:\workspace\osp-gojimmypi\realm\VS2022\Debug\x64\wolfssl.lib
+# e.g C:\workspace\osp-$USER\realm\VS2022\Debug\x64\wolfssl.lib
 set(REALM_WOLFSSL_ROOT_DIR "${THIS_OUTPUT_DIRECTORY}" CACHE PATH "Path to the wolfSSL root directory")
 
-set(WOLFSSL_ROOT "/mnt/c/workspace/wolfssl")
+# Optionally have a hard-coded WOLFSSL_ROOT here
+if (0)
+    set(WOLFSSL_ROOT "/mnt/c/workspace/wolfssl")
+endif()
 
-message(STATUS "WOLFSSL_ROOT=${WOLFSSL_ROOT}")
-message(STATUS "WOLFSSL_USER_SETTINGS_DIRECTORY=${WOLFSSL_USER_SETTINGS_DIRECTORY}")
+# REALM_WOLFSSL_ROOT_DIR typically passed as a cmake parameter in bash : -DREALM_WOLFSSL_ROOT_DIR="/home/$USER/wolfssl-install-dir"
+message(STATUS "REALM_WOLFSSL_ROOT_DIR:          '${REALM_WOLFSSL_ROOT_DIR}'")
+message(STATUS "WOLFSSL_ROOT:                    '${WOLFSSL_ROOT}'")
+message(STATUS "WOLFSSL_USER_SETTINGS_DIRECTORY: '${WOLFSSL_USER_SETTINGS_DIRECTORY}'")
+
 
 # root realm cmake file
-set(VS_ROOT "xyzzy" CACHE STRING "Custom variable for VS_ROOT")
-message(STATUS "")
-message(STATUS "hi there!")
+# set(VS_ROOT "xyzzy" CACHE STRING "Custom variable for VS_ROOT")
+# message(STATUS "")
+# message(STATUS "hi there!")
+
 if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    message(STATUS "Detected main project as Visual Studio build")
     if("${WOLFSSL_ROOT}")
         message(STATUS "Using WOLFSSL_ROOT=${WOLFSSL_ROOT}")
     else()
@@ -60,14 +73,17 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
         message(STATUS "NOT Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
     endif()
 
-    message(STATUS "Visual Studio Build")
     add_compile_definitions(WOLFSSL_LIB)
     add_compile_definitions(WOLFSSL_USER_SETTINGS)
-    option(REALM_INCLUDE_CERTS "Include certs in Realm" ON)
-    option(REALM_ENABLE_ENCRYPTION "Enable encryption in Realm" ON)
-    option(REALM_ENABLE_SYNC "Enable sync in Realm" ON)
-    option(REALM_HAVE_OPENSSL "Disable OpenSSL in Realm" OFF)
-    option(REALM_HAVE_WOLFSSL "Enable wolfSSL in Realm" ON)
+
+    if(1)
+        # Optionally adjust some known settings
+        option(REALM_INCLUDE_CERTS     "Include certs in Realm"     ON)
+        option(REALM_ENABLE_ENCRYPTION "Enable encryption in Realm" ON)
+        option(REALM_ENABLE_SYNC       "Enable sync in Realm"       ON)
+        option(REALM_HAVE_OPENSSL      "Disable OpenSSL in Realm"   OFF)
+        option(REALM_HAVE_WOLFSSL      "Enable wolfSSL in Realm"    ON)
+    endif()
     message(STATUS "new paths:")
 
     # This line will adjust project file Additional Include Files contents with VS variable, not cmake!:
@@ -75,19 +91,20 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     get_filename_component(THIS_PARENT_DIRECTORY "${THIS_PARENT_DIRECTORY_WRK}" ABSOLUTE)
     message(STATUS "THIS_PARENT_DIRECTORY=${THIS_PARENT_DIRECTORY}")
 
-    # Visual Studio project file variables cannot be "seen" here.
+    # Visual Studio project file variables cannot be "seen" here, so we need to manually assemble the ones we need:
     # "${THIS_PARENT_DIRECTORY}/VS2022/include" here is equivalent to
     #                  "$(SolutionDir)/include" in the Visual Studio project file.
     include_directories("${THIS_PARENT_DIRECTORY}/VS2022/include" "${WOLFSSL_ROOT}/wolfssl" "${WOLFSSL_ROOT}")
 
     link_directories("${THIS_OUTPUT_DIRECTORY}")
+
+    # If Visual Studio, we'll point to woSSL source code, each up to 3 directories up in the relative D[n] path:
     set(REALM_WOLFSSL_LIB             "${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
-    set(REALM_WOLFSSL_LIB_D1       "../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
-    set(REALM_WOLFSSL_LIB_D2    "../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
-    set(REALM_WOLFSSL_LIB_D3 "../../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D1       "../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory in parent")
+    set(REALM_WOLFSSL_LIB_D2    "../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory 2 parents up")
+    set(REALM_WOLFSSL_LIB_D3 "../../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory 3 parents up")
 
-    message(STATUS "root cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
-
+    # optional find_package
     if(0)
         find_package(wolfssl REQUIRED)
     endif()
@@ -95,7 +112,6 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     if(NOT TARGET wolfssl)
         message(STATUS ">>> add library wolfSSL! (root realm cmake file)")
         add_library(wolfssl STATIC IMPORTED)
-
     else()
         message(STATUS ">>> Skip library wolfSSL! already found.")
     endif()
@@ -118,18 +134,23 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 
     set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "${THIS_OUTPUT_DIRECTORY}/wolfssl.Lib")
 else()
- add_library(wolfssl STATIC IMPORTED)
+    add_library(wolfssl STATIC IMPORTED)
     message(STATUS "Found CMAKE_GENERATOR that is NOT Visual Studio: ${CMAKE_GENERATOR}")
-   #link_directories("${THIS_OUTPUT_DIRECTORY}")
-  #  message(STATUS "Setting REALM_WOLFSSL_LIB_D[depth] values...")
-  #  set(REALM_WOLFSSL_LIB             "${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
-  #  set(REALM_WOLFSSL_LIB_D1       "../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
-  #  set(REALM_WOLFSSL_LIB_D2    "../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
-  #  set(REALM_WOLFSSL_LIB_D3 "../../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
-    set(REALM_WOLFSSL_LIB             "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
-    set(REALM_WOLFSSL_LIB_D1       "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
-    set(REALM_WOLFSSL_LIB_D2    "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
-    set(REALM_WOLFSSL_LIB_D3 "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
+    if (0)
+        # Optional include source code similar to Visual Studio build, rather than pre-compiled
+        #  link_directories("${THIS_OUTPUT_DIRECTORY}")
+        #  message(STATUS "Setting REALM_WOLFSSL_LIB_D[depth] values...")
+        #  set(REALM_WOLFSSL_LIB             "${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+        #  set(REALM_WOLFSSL_LIB_D1       "../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+        #  set(REALM_WOLFSSL_LIB_D2    "../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+        #  set(REALM_WOLFSSL_LIB_D3 "../../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    else()
+        # when using an alternate preinstalled directory, not relative to current path, all the LIB_D[n] point to the same directory:
+        set(REALM_WOLFSSL_LIB    "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
+        set(REALM_WOLFSSL_LIB_D1 "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
+        set(REALM_WOLFSSL_LIB_D2 "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
+        set(REALM_WOLFSSL_LIB_D3 "${REALM_WOLFSSL_ROOT_DIR}/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
+    endif()
 endif()
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
