@@ -25,7 +25,13 @@ file(COPY ${AFL_SEEDS}
 
 add_executable(realm-afl++ ${TEST_AFL_SOURCES})
 target_link_libraries(realm-afl++ TestUtil ObjectStore)
-
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    else()
+        message(STATUS "")
+        message(STATUS "realm-afl++ REALM_ENABLE_ENCRYPTION UNIX target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories(realm-afl++ PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        message(STATUS "")
+    endif()
 if(REALM_LIBFUZZER)
     if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
         add_executable(realm-libfuzz ${TEST_LIBFUZZER_SOURCES})

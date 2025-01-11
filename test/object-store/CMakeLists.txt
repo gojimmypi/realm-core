@@ -181,6 +181,7 @@ target_include_directories(ObjectStoreTestLib PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
+
 # on Apple platforms we use the built-in CFRunLoop
 # on WebAssembly we use an Emscripten-specific Scheduler and runloop
 # everywhere else it's libuv, except UWP where it doesn't build
@@ -226,3 +227,11 @@ add_subdirectory(notifications-fuzzer)
 if(NOT EMSCRIPTEN AND NOT WINDOWS_STORE AND NOT ANDROID)
     add_subdirectory(benchmarks)
 endif()
+
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    else()
+        message(STATUS "")
+        message(STATUS " ObjectStoreTestLib REALM_ENABLE_ENCRYPTION UNIX target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories( ObjectStoreTestLib PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        message(STATUS "")
+    endif()

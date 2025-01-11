@@ -239,7 +239,6 @@ if(REALM_ENABLE_SYNC)
     add_library(SyncTestLib OBJECT ${SYNC_TESTS} ${SYNC_TEST_HEADERS} ${SYNC_TEST_RESOURCES})
     enable_stdfilesystem(SyncTestLib)
     target_link_libraries(SyncTestLib Sync SyncServer Storage "${REALM_WOLFSSL_LIB_D2}")
-
     message(STATUS "SyncTestLib REALM_WOLFSSL_LIB=${REALM_WOLFSSL_LIB_D2}")
     add_executable(SyncTests main.cpp test_all.cpp ${SYNC_TEST_RESOURCES})
     set_target_properties(SyncTests PROPERTIES OUTPUT_NAME "realm-sync-tests")
@@ -247,6 +246,13 @@ if(REALM_ENABLE_SYNC)
     enable_stdfilesystem(SyncTests)
     target_link_libraries(SyncTests SyncTestLib TestUtil "${REALM_WOLFSSL_LIB_D2}")
     add_bundled_test(SyncTests)
+        if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+        else()
+            message(STATUS "")
+            message(STATUS "SyncTestLib target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+            target_include_directories(SyncTestLib PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+            target_include_directories(SyncTests PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        endif()
 
     if(UNIX AND NOT APPLE)
         # This enables symbols in backtraces
@@ -266,6 +272,14 @@ set_target_properties(CombinedTests PROPERTIES
 )
 target_include_directories(CombinedTests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "object-store")
 
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    else()
+        message(STATUS "")
+        message(STATUS "test target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories(CoreTests PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(CoreTestLib PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+    endif()
+
 if(WINDOWS_STORE)
     target_sources(CombinedTests PRIVATE ${UWP_SOURCES})
 endif()
@@ -275,6 +289,15 @@ if(REALM_ENABLE_SYNC)
 else()
     target_link_libraries(CombinedTests ObjectStoreTestLib CoreTestLib             TestUtil "${REALM_WOLFSSL_LIB_D2}")
 endif()
+
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    else()
+        message(STATUS "")
+        message(STATUS " CombinedTests REALM_ENABLE_ENCRYPTION UNIX target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories(CombinedTests PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        message(STATUS "")
+    endif()
+
 
 enable_stdfilesystem(CombinedTests)
 

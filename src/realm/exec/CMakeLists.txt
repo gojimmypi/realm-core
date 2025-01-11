@@ -1,13 +1,22 @@
 message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 
+
 add_executable(RealmImporter importer_tool.cpp importer.cpp importer.hpp)
 set_target_properties(RealmImporter PROPERTIES
     OUTPUT_NAME "realm-importer"
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
 
+# include_directories("/mnt/c/workspace/wolfssl/wolfssl" "/mnt/c/workspace/wolfssl")
+
+
+ #   target_include_directories(RealmImporter PRIVATE
+ #       /mnt/c/workspace/wolfssl
+ #   )
+
 message(STATUS "RealmImporter wolfssl: ${REALM_WOLFSSL_LIB_D3}")
 target_link_libraries(RealmImporter Storage "${REALM_WOLFSSL_LIB_D3}")
+target_include_directories(RealmImporter PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
 
 if(NOT APPLE AND NOT ANDROID AND NOT CMAKE_SYSTEM_NAME MATCHES "^Windows")
     add_executable(RealmDaemon realmd.cpp)
@@ -72,6 +81,24 @@ set_target_properties(Realm2JSON PROPERTIES
 target_link_libraries(Realm2JSON Storage QueryParser Sync "${REALM_WOLFSSL_LIB_D3}")
 list(APPEND ExecTargetsToInstall Realm2JSON)
 endif()
+
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    else()
+        message(STATUS "")
+        message(STATUS "RealmFFIStatic target_link_libraries '${REALM_WOLFSSL_LIB}'")
+        message(STATUS "RealmFFIStatic target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories(RealmImporter PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(RealmDaemon PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(RealmEnumerate PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(RealmTrawler PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        #target_include_directories(RealmDecrypt PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+
+        target_include_directories(RealmDecrypt PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(RealmEncrypt PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(RealmBrowser PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(Realm2JSON   PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        message(STATUS "")
+    endif()
 
 add_executable(RealmDump realm_dump.c)
 set_target_properties(RealmDump PROPERTIES

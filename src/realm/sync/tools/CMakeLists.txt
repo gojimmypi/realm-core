@@ -35,6 +35,18 @@ set_target_properties(HistCommand PROPERTIES
                       DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
 target_link_libraries(HistCommand Sync Storage "${REALM_WOLFSSL_LIB}")
 
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    else()
+        message(STATUS "")
+        message(STATUS "RealmFFIStatic target_link_libraries '${REALM_WOLFSSL_LIB}'")
+        message(STATUS "RealmFFIStatic target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories(InspectorInspectClientRealm PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(InspectorPrintChangeset PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(ApplyToStateCommand PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(HistCommand PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        message(STATUS "")
+    endif()
+
 install(TARGETS
     HistCommand
     ApplyToStateCommand

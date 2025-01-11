@@ -24,7 +24,12 @@ file(COPY ${AFL_SEEDS}
 
 add_executable(fuzz-group ${TEST_AFL_SOURCES})
 target_link_libraries(fuzz-group TestUtil Storage)
-
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    else()
+        message(STATUS "ObjectStore REALM_ENABLE_ENCRYPTION UNIX target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories(fuzz-group  PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        message(STATUS "")
+    endif()
 if(REALM_LIBFUZZER)
     add_executable(realm-libfuzzer ${TEST_LIBFUZZER_SOURCES})
     target_link_libraries(realm-libfuzzer TestUtil Storage)

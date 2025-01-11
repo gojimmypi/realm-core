@@ -75,6 +75,17 @@ add_library(Realm::QueryParser ALIAS QueryParser)
 target_link_libraries(QueryParser PUBLIC Storage)
 set_target_properties(QueryParser PROPERTIES OUTPUT_NAME "realm-parser")
 
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+        message(STATUS "Parser for Visual Studio")
+    else()
+        message(STATUS "")
+        message(STATUS "Parser REALM_ENABLE_ENCRYPTION UNIX target_link_libraries '${REALM_WOLFSSL_LIB}'")
+        target_link_libraries(QueryParser PUBLIC "${REALM_WOLFSSL_LIB}")
+        message(STATUS "Parser REALM_ENABLE_ENCRYPTION UNIX target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories(QueryParser PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        message(STATUS "")
+    endif()
+
 install(TARGETS QueryParser EXPORT realm
         ARCHIVE DESTINATION lib
         COMPONENT devel)

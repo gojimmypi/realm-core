@@ -14,5 +14,11 @@ else()
 endif()
 
 target_link_libraries(realm-benchmark-common-tasks TestUtil QueryParser ${REALM_WOLFSSL_LIB_D3})
-
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+    else()
+        message(STATUS "")
+        message(STATUS "RealmFFIStatic target_link_libraries '${REALM_WOLFSSL_LIB}'")
+        target_include_directories(realm-benchmark-common-tasks PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        message(STATUS "")
+    endif()
 add_dependencies(benchmarks realm-benchmark-common-tasks)

@@ -31,8 +31,19 @@ target_link_libraries(SyncServer PUBLIC Sync QueryParser)
 
 if(APPLE AND NOT REALM_FORCE_OPENSSL)
     target_sources(SyncServer PRIVATE crypto_server_apple.mm)
-elseif(REALM_HAVE_OPENSSL OR REALM_HAVE_WOLFSSL)
+elseif(REALM_HAVE_OPENSSL)
     target_sources(SyncServer PRIVATE crypto_server_openssl.cpp)
+elseif(REALM_HAVE_WOLFSSL)
+    target_sources(SyncServer PRIVATE crypto_server_openssl.cpp)
+
+        if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+        else()
+            message(STATUS "")
+            message(STATUS "SyncServer target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+            target_include_directories(SyncServer PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        endif()
+
+
 else()
     target_sources(SyncServer PRIVATE crypto_server_stub.cpp)
 endif()

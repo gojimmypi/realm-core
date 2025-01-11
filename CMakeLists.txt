@@ -13,6 +13,8 @@ message(STATUS "THIS_OUTPUT_DIRECTORY: ${THIS_OUTPUT_DIRECTORY}")
 # C:\workspace\osp-gojimmypi\realm\VS2022\Debug\x64\wolfssl.lib
 set(REALM_WOLFSSL_ROOT_DIR "${THIS_OUTPUT_DIRECTORY}" CACHE PATH "Path to the wolfSSL root directory")
 
+set(WOLFSSL_ROOT "/mnt/c/workspace/wolfssl")
+
 message(STATUS "WOLFSSL_ROOT=${WOLFSSL_ROOT}")
 message(STATUS "WOLFSSL_USER_SETTINGS_DIRECTORY=${WOLFSSL_USER_SETTINGS_DIRECTORY}")
 
@@ -38,7 +40,7 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
             message(STATUS "Set default WOLFSSL_ROOT=${WOLFSSL_ROOT}")
         endif()
     endif()
-
+    set(WOLFSSL_BREADCRUMB ON)
     message(STATUS "File version 0019")
     if(WOLFSSL_BREADCRUMB)
         message(STATUS "Found WOLFSSL_BREADCRUMB! in ${CMAKE_CURRENT_LIST_FILE}")
@@ -103,6 +105,7 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     # Import wolfSSL Visual Studio project.
     # Project is assumed to have defined WOLFSSL_USER_SETTINGS WOLFSSL_LIB, etc.
     include(ExternalProject)
+    set(WOLFSSL_MACROS "/DWOLFSSL_USER_SETTINGS" "/DMY_WOLFSSL_BREADCRUMB=1")
     include_external_msproject(wolfssl  "./wolfssl-VS2022-cmake.vcxproj" )
 
     # Optional pre-build project steps could go here
@@ -115,7 +118,18 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 
     set_target_properties(wolfssl PROPERTIES IMPORTED_LOCATION "${THIS_OUTPUT_DIRECTORY}/wolfssl.Lib")
 else()
+ add_library(wolfssl STATIC IMPORTED)
     message(STATUS "Found CMAKE_GENERATOR that is NOT Visual Studio: ${CMAKE_GENERATOR}")
+   #link_directories("${THIS_OUTPUT_DIRECTORY}")
+  #  message(STATUS "Setting REALM_WOLFSSL_LIB_D[depth] values...")
+  #  set(REALM_WOLFSSL_LIB             "${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+  #  set(REALM_WOLFSSL_LIB_D1       "../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+  #  set(REALM_WOLFSSL_LIB_D2    "../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+  #  set(REALM_WOLFSSL_LIB_D3 "../../../${THIS_OUTPUT_DIRECTORY}/wolfssl" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB             "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D1       "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D2    "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
+    set(REALM_WOLFSSL_LIB_D3 "/home/gojimmypi/wolfssl-install-dir/lib/libwolfssl.so" CACHE PATH "Path to the wolfSSL root directory")
 endif()
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
