@@ -50,12 +50,16 @@ public:
     #error "Both OpenSSL and wolfSSL enabled. Pick one."
 #endif
 
+// #pragma message ("aes_cryptor file")
 #if REALM_PLATFORM_APPLE
     #include <CommonCrypto/CommonCrypto.h>
+    #pragma message ("aes_cryptor apple")
 #elif REALM_HAVE_OPENSSL
     #include <openssl/sha.h>
     #include <openssl/evp.h>
+    #pragma message ("aes_cryptor OpenSSL")
 #elif REALM_HAVE_WOLFSSL
+//    #pragma message("aes_cryptor wolfSSL")
     #ifdef HAVE_CONFIG_H
         #include <config.h>
     #endif
@@ -67,6 +71,7 @@ public:
     #include <wolfssl/openssl/evp.h>
     #include <wolfssl/openssl/sha.h>
 #elif defined(_WIN32)
+    #pragma message ("aes_cryptor _WIN32")
     #include <windows.h>
     #include <stdio.h>
     #include <bcrypt.h>

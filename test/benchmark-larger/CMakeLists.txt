@@ -1,4 +1,4 @@
-message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+message(STATUS "\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 message(STATUS "REALM_WOLFSSL_LIB wolfssl: ${REALM_WOLFSSL_LIB}")
 message(STATUS "REALM_WOLFSSL_LIB_D2 wolfssl: ${REALM_WOLFSSL_LIB_D2}")
 

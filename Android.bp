@@ -147,7 +147,8 @@ cc_defaults {
     cflags: [
         "-fPIC",
         "-DREALM_NO_CONFIG",
-        "-DREALM_HAVE_OPENSSL=1",
+        "-DREALM_HAVE_OPENSSL=0",
+        "-DREALM_HAVE_WOLFSSL=1",
         "-DREALM_INCLUDE_CERTS=1",
         "-DREALM_ENABLE_ENCRYPTION=1",
         "-DREALM_ENABLE_SYNC=1",

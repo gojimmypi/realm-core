@@ -43,7 +43,7 @@
         #include <wolfssl/wolfcrypt/settings.h>
     #endif
     #ifndef WOLFSSL_EVP_INCLUDED
-        #error "WOLFSSL_EVP_INCLUDED needed"
+    //    #error "WOLFSSL_EVP_INCLUDED needed"
     #else
        // #pragma message "sha_crypto WOLFSSL_EVP_INCLUDED"
     #endif
