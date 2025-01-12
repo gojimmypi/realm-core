@@ -4,8 +4,8 @@ if(REALM_HAVE_WOLFSSL AND REALM_HAVE_OPENSSL)
 else()
     # Optionally force wolfSSL
     # set(REALM_HAVE_WOLFSSL 1)
-    message(STATUS "REALM_HAVE_WOLFSSL: $(REALM_HAVE_WOLFSSL)")
-    message(STATUS "REALM_HAVE_OPENSSL: $(REALM_HAVE_OPENSSL)")
+    message(STATUS "REALM_HAVE_WOLFSSL: ${REALM_HAVE_WOLFSSL}")
+    message(STATUS "REALM_HAVE_OPENSSL: ${REALM_HAVE_OPENSSL}")
 endif()
 message(STATUS "\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
 
