@@ -178,7 +178,10 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     # Project is assumed to have defined WOLFSSL_USER_SETTINGS WOLFSSL_LIB, etc.
     include(ExternalProject)
     set(WOLFSSL_MACROS "/DWOLFSSL_USER_SETTINGS" "/DMY_WOLFSSL_BREADCRUMB=1")
-    include_external_msproject(wolfssl  "./wolfssl-VS2022-cmake.vcxproj" )
+
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+        include_external_msproject(wolfssl  "./wolfssl-VS2022-cmake.vcxproj" )
+    endif()
 
     # Optional pre-build project steps could go here
     if(0)
