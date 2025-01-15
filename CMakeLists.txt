@@ -44,7 +44,7 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
     elseif ((${CMAKE_GENERATOR_PLATFORM} MATCHES "ARM64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64"))
         set(THIS_OUTPUT_DIRECTORY "../VS2022/${CMAKE_BUILD_TYPE}/ARM64")
     else()
-        set(THIS_OUTPUT_DIRECTORY "../VS2022/${CMAKE_BUILD_TYPE}/bin")
+        set(THIS_OUTPUT_DIRECTORY "../VS2022/Debug/x64")
     endif()
 
     if (EXISTS "${THIS_OUTPUT_DIRECTORY}")
@@ -65,6 +65,7 @@ if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
 else()
     set(THIS_OUTPUT_DIRECTORY "../VS2022/bin")
 endif()
+
 
 get_filename_component(THIS_ABSOLUTE_PATH "${THIS_OUTPUT_DIRECTORY}" ABSOLUTE)
 
