@@ -399,7 +399,7 @@ if(REALM_ENABLE_ENCRYPTION AND UNIX AND NOT APPLE AND (REALM_HAVE_OPENSSL OR REA
         message(STATUS "REALM_ENABLE_ENCRYPTION UNIX target_link_libraries '${REALM_WOLFSSL_LIB}'")
         target_link_libraries(Storage PUBLIC "${REALM_WOLFSSL_LIB}")
         message(STATUS "REALM_ENABLE_ENCRYPTION UNIX target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
-        target_include_directories(Storage PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
+        target_include_directories(Storage PUBLIC ${REALM_WOLFSSL_ROOT_DIR}/include)
     elseif (REALM_HAVE_OPENSSL)
         message(STATUS "REALM_ENABLE_ENCRYPTION UNIX target_link_libraries OpenSSL::Crypto")
         target_link_libraries(Storage PUBLIC OpenSSL::Crypto)
