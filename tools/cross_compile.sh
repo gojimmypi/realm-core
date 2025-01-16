@@ -77,6 +77,13 @@ if [ "${OS}" == "android" ]; then
           -D CMAKE_TOOLCHAIN_FILE="./tools/cmake/android.toolchain.cmake" \
           -D REALM_ENABLE_ENCRYPTION=1 \
           -D REALM_VERSION="${VERSION}" \
+          -D WOLFSSL_USE_OPTIONS_H=1 \
+          -D REALM_INCLUDE_CERTS=1 \
+          -D REALM_ENABLE_ENCRYPTION=1 \
+          -D REALM_ENABLE_SYNC=1 \
+          -D REALM_HAVE_WOLFSSL=1 \
+          -D REALM_HAVE_OPENSSL=0 \
+          -D REALM_WOLFSSL_ROOT_DIR="${WOLFSSL_ROOT_DIR}" \
           -D CPACK_SYSTEM_NAME="Android-${ARCH}" \
           -D CMAKE_MAKE_PROGRAM=ninja \
           -G Ninja \
