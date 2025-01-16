@@ -214,7 +214,6 @@ else()
 endif()
 
 message(STATUS "CMake version: ${CMAKE_VERSION}")
-set(CMAKE_SYSTEM_VERSION 10.0.22621.0)
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "")
 project(RealmCore)
 
