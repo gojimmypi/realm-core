@@ -1,6 +1,9 @@
-message("\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+message(STATUS "\n\n=======================================================\nCurrent CMake file: ${CMAKE_CURRENT_LIST_FILE}")
+message(STATUS "wow!")
 if(REALM_HAVE_WOLFSSL)
     message(STATUS "realm cmake: REALM_WOLFSSL_ROOT_DIR=${REALM_WOLFSSL_ROOT_DIR}")
+else()
+    message(STATUS "realm cmake: REALM_HAVE_WOLFSSL not set!")
 endif()
 set(REALM_SOURCES
     # slowest to compile first
@@ -302,6 +305,14 @@ if (REALM_ENABLE_GEOSPATIAL)
     list(APPEND REALM_OBJECT_FILES $<TARGET_OBJECTS:s2geometry>)
 endif()
 
+message(STATUS "REALM_SOURCES ${REALM_SOURCES}")
+message(STATUS "UTIL_SOURCES ${UTIL_SOURCES}")
+message(STATUS "REALM_INSTALL_HEADERS ${REALM_INSTALL_HEADERS}")
+message(STATUS "REALM_WOLFSSL_LIB ${REALM_WOLFSSL_LIB}")
+message(STATUS " ${}")
+message(STATUS " ${}")
+message(STATUS " ${}")
+
 add_library(Storage STATIC
     ${REALM_SOURCES}
     ${UTIL_SOURCES}
@@ -309,6 +320,7 @@ add_library(Storage STATIC
     ${REALM_NOINST_HEADERS}
     ${REALM_OBJECT_FILES}
     $<TARGET_OBJECTS:Bid>
+
 )
 
 add_library(Realm::Storage ALIAS Storage)
@@ -342,6 +354,7 @@ target_include_directories(Storage INTERFACE
 # On systems without a built-in SHA-1 implementation (or one provided by a dependency)
 # we need to bundle the public domain implementation.
 if(NOT APPLE AND NOT CMAKE_SYSTEM_NAME MATCHES "^Windows" AND NOT REALM_HAVE_OPENSSL AND NOT REALM_HAVE_WOLFSSL)
+    message(STATUS "realm cmake sha: REALM_HAVE_WOLFSSL not set!")
     add_library(sha1 OBJECT ../external/sha-1/sha1.c)
     target_include_directories(Storage PRIVATE ../external/sha-1)
     target_sources(Storage PRIVATE $<TARGET_OBJECTS:sha1>)
@@ -383,9 +396,22 @@ endif()
 if(REALM_ENABLE_ENCRYPTION AND UNIX AND NOT APPLE AND (REALM_HAVE_OPENSSL OR REALM_HAVE_WOLFSSL))
     message(STATUS "REALM_ENABLE_ENCRYPTION UNIX enabled")
     if (REALM_HAVE_WOLFSSL)
+        message(STATUS "REALM_ENABLE_ENCRYPTION UNIX target_link_libraries '${REALM_WOLFSSL_LIB}'")
         target_link_libraries(Storage PUBLIC "${REALM_WOLFSSL_LIB}")
+        message(STATUS "REALM_ENABLE_ENCRYPTION UNIX target_include_directories '${REALM_WOLFSSL_ROOT_DIR}/include'")
+        target_include_directories(Storage PRIVATE ${REALM_WOLFSSL_ROOT_DIR}/include)
     elseif (REALM_HAVE_OPENSSL)
+        message(STATUS "REALM_ENABLE_ENCRYPTION UNIX target_link_libraries OpenSSL::Crypto")
         target_link_libraries(Storage PUBLIC OpenSSL::Crypto)
+    else()
+        message(STATUS "REALM_ENABLE_ENCRYPTION UNKNOWN Environment")
+    endif()
+else()
+    message(STATUS "NOT REALM_ENABLE_ENCRYPTION AND UNIX AND NOT APPLE ")
+    if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+        message(STATUS "Storage target_include_directories not used for Visual Studio project. (see project properties)")
+    else()
+        message(STATUS "NOT Visual Studio")
     endif()
 endif()
 
@@ -431,3 +457,6 @@ if(NOT REALM_BUILD_LIB_ONLY AND NOT WINDOWS_STORE)
     add_subdirectory(exec)
     set_macos_only(exec)
 endif()
+message(STATUS "${CMAKE_CURRENT_LIST_DIR}")
+message(STATUS "${CMAKE_CURRENT_LIST_FILE}")
+message(STATUS "src/ream/cmake done!")
